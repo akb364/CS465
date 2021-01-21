@@ -12,7 +12,10 @@ public class EchoServer{
       System.exit(1);
     }
 
+    Boolean runServer = true;
+
     Socket clientSock = null;
+
     System.out.println("[+]Listening for connection... ");
     try{
       clientSock = serverSock.accept();
@@ -21,25 +24,17 @@ public class EchoServer{
       System.exit(1);
     }
 
-    System.out.println("[+]Connection successful.");
-    System.out.println("[+]Listening for input");
+    while(runServer) 
+    {
+      clientSock = serverSock.accept();
 
-    PrintWriter output = new PrintWriter(clientSock.getOutputStream(), true);
-    BufferedReader input = new BufferedReader(new InputStreamReader(clientSock.getInputStream()));
+      System.out.println("[+]Connection successful.");
+      System.out.println("[+]Listening for input");
 
-    String inputLine;
-
-    while((inputLine = input.readLine()) != null){
-      System.out.println("Server: " + inputLine);
-      output.println(inputLine);
-
-      if(inputLine.equals("quit")){
-        break;
-      }
+      new Thread(new EchoThread(clientSock)).start();
     }
-    output.close();
-    input.close();
     clientSock.close();
+    
     serverSock.close();
   }
 }
