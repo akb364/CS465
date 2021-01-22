@@ -2,6 +2,7 @@ public class StateMachine
 {
     private boolean stateQ, stateU, stateI, stateT;
 
+    // StateMachine Constructor
     StateMachine()
     {
         stateQ = false;
@@ -9,6 +10,9 @@ public class StateMachine
         stateI = false;
         stateT = false;
     }
+
+    // Function to check whether client input contains keyword 'quit'
+    // changes letter "state" based on user input
     public void updateState(char inputChar)
     {
         if( isLetter(inputChar) )
@@ -44,10 +48,14 @@ public class StateMachine
             }
         }
     }
+
+    // Helper function to check if client has entered letter "T"
     public boolean isAtFinalState()
     {
         return stateT;
     }
+
+    // Helper function that checks if char is a valid letter
     private boolean isLetter(char inputChar)
     {
         return (inputChar >= 'a' && inputChar <= 'z') ||
