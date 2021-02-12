@@ -6,9 +6,10 @@ public class ChatNode
 {
     private Participant self;
     private LinkedList<Participant> participantList;
+    private Socket sock;
     private ServerSocket serverSock;
-    private Sender sender;
-    private Receiver receiver;
+    //private Sender sender;
+    //private Receiver receiver;
 
     public ChatNode(String ip)
     {
@@ -21,17 +22,64 @@ public class ChatNode
         {
 
         }
-        self = new Participant(ip, serverSock.getLocalPort());
 
-        participantList = new LinkedList<Participant>();
-        participantList.add(self);
+        this.self = new Participant(ip, serverSock.getLocalPort());
+        this.participantList = new LinkedList<Participant>();
+
+        //this.sender = new Sender(this.self);
+        //this.receiver = new Receiver(this.self);
 
     }
 
-    public void run()
+    public static void main(String[] args)
     {
 
+        String ownIP = args[0];
+
+        ChatNode node = new ChatNode(ownIP);
+
+        println("listening on port " + (String) node.self.port);
+
+        // if user gives other ip & port
+        if( args[1] != NULL && args[2] != NULL)
+        {
+            otherNodeIP = args[1];
+            int otherNodePort = Integer.parseInt(args[2]);
+
+            connectToMesh(new Participant(otherNodeIP, otherNodePort))
+        }
+
+        runReceiver();
+
+        println("done message");
+
     }
+
+    public void connectToMesh(Participant meshParticipant)
+    {
+        // open connection with other node
+        joinConnection = new Socket(meshParticipant.ip, meshParticipant.port);
+
+        // send request message to node
+        writeToNet = ObjectOutputStream(joinConnection.getOutputStream());
+        readFromNet = ObjectInputStream(joinConnection.getInputStream());
+
+        writeToNet.writeObject(new JoinMessage(self));
+
+        participantList = readFromNet.readObject();
+    }
+
+    public void runReceiver()
+    {
+        Boolean runServer = true;
+
+        while(runServer)
+        {
+
+        }
+
+    }
+
 }
 
 class Participant
@@ -48,14 +96,47 @@ class Participant
 
 class Sender
 {
+    private Participant self;
+
+    public Sender(Participant self)
+    {
+        this.self = self;
+    }
+
 
 }
 
 class Receiver
 {
 
+    private ServerSocket serverSock;
+    private int port;
+
+    public Receiver(int port)
+    {
+        this.port = port;
+    }
+
+    public void runReceiver()
+    {
+        Boolean runServer = true;
+
+        while(runServer)
+        {
+
+        }
+
+
+    }
+
+    private handleReceive() implements Runnable
+    {
+
+    }
+
 }
 
+// base class
 class MessageType
 {
     public Participant sender;
@@ -67,11 +148,11 @@ class MessageType
 }
 
 // sent from joining node to random node in mesh
-class JoinMessage extends MessageType
+class JoinMessage extends MessageType implements Serializable
 {
     public JoinMessage(Participant sender)
     {
-        super(sender);
+       super(sender);
     }
 }
 
@@ -123,4 +204,3 @@ class LeaveMessage extends MessageType
         super(sender);
     }
 }
-
