@@ -2,12 +2,39 @@ import java.util.*;
 import java.net.*;
 import java.io.*;
 
-public class ChatNode
+public class Driver
 {
-    private Participant self;
+    public static void main(String[] args)
+    {
+        String ownIP = args[0];
+
+        ChatNode node = new ChatNode(ownIP);
+
+        System.out.println("listening on port " + Integer.toString(node.self.port));
+
+        // if user gives other ip & port
+        if( args.length > 1 )
+        {
+            System.out.println("hi");
+
+            String otherNodeIP = args[0];
+            int otherNodePort = Integer.parseInt(args[1]);
+
+            node.connectToMesh(new Participant(otherNodeIP, otherNodePort));
+        }
+
+        //runReceiver();
+
+        System.out.println("done message");
+    }
+}
+
+class ChatNode
+{
+    public Participant self;
     private LinkedList<Participant> participantList;
     private Socket sock;
-    private ServerSocket serverSock;
+    private ServerSocket serverSock; 
     //private Sender sender;
     //private Receiver receiver;
 
@@ -31,42 +58,30 @@ public class ChatNode
 
     }
 
-    public static void main(String[] args)
-    {
-
-        String ownIP = args[0];
-
-        ChatNode node = new ChatNode(ownIP);
-
-        println("listening on port " + (String) node.self.port);
-
-        // if user gives other ip & port
-        if( args[1] != NULL && args[2] != NULL)
-        {
-            otherNodeIP = args[1];
-            int otherNodePort = Integer.parseInt(args[2]);
-
-            connectToMesh(new Participant(otherNodeIP, otherNodePort))
-        }
-
-        runReceiver();
-
-        println("done message");
-
-    }
-
     public void connectToMesh(Participant meshParticipant)
     {
+        try
+        {
         // open connection with other node
-        joinConnection = new Socket(meshParticipant.ip, meshParticipant.port);
+        Socket joinConnection = new Socket(meshParticipant.ip, meshParticipant.port);
 
         // send request message to node
-        writeToNet = ObjectOutputStream(joinConnection.getOutputStream());
-        readFromNet = ObjectInputStream(joinConnection.getInputStream());
+        ObjectOutputStream writeToNet = new ObjectOutputStream(joinConnection.getOutputStream());
+        ObjectInputStream readFromNet = new ObjectInputStream(joinConnection.getInputStream());
 
         writeToNet.writeObject(new JoinMessage(self));
 
-        participantList = readFromNet.readObject();
+        //Object incoming = readFromNet.readObject();
+        participantList.add((Participant)readFromNet.readObject());
+        }
+        catch(IOException e)
+        {
+            System.out.println("hi");
+        }
+        catch(ClassNotFoundException e)
+        {
+            System.out.println("hi");
+        }
     }
 
     public void runReceiver()
@@ -75,9 +90,29 @@ public class ChatNode
 
         while(runServer)
         {
+            try
+            {
+            Socket clientSock = serverSock.accept();
+
+            ObjectInputStream readFromNet = new ObjectInputStream(clientSock.getInputStream());
+
+            Object input = readFromNet.readObject();
+
+            if(input instanceof JoinMessage)
+            {
+
+            }
+            }
+            catch(IOException e)
+            {
+                System.out.println("hi");
+            }
+            catch(ClassNotFoundException e)
+            {
+                System.out.println("hi");
+            } 
 
         }
-
     }
 
 }
@@ -102,7 +137,6 @@ class Sender
     {
         this.self = self;
     }
-
 
 }
 
@@ -129,10 +163,10 @@ class Receiver
 
     }
 
-    private handleReceive() implements Runnable
+    /*public void handleReceive() implements Runnable
     {
 
-    }
+    }*/
 
 }
 
@@ -204,3 +238,5 @@ class LeaveMessage extends MessageType
         super(sender);
     }
 }
+
+
