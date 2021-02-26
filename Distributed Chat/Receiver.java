@@ -2,50 +2,38 @@ import java.util.*;
 import java.net.*;
 import java.io.*;
 
-public class Receiver
+public class Receiver extends Thread implements Serializable
 {
 
-    private ServerSocket serverSock;
-    private int port;
+    static ServerSocket receiverSock;
 
-    public Receiver(int port)
+    public Receiver(Participant myInfo)
     {
-        this.port = port;
+        try
+        {
+            receiverSock = new ServerSocket(myInfo.port);
+            System.out.println("Receiver socket created on port " + myInfo.port);
+        }
+        catch (IOException ex)
+        {
+            System.out.println(ex.toString());
+        }
     }
 
-    // should spawn off worker thread for each accept
-    public void runReceiver() // extends thread?
+    @Override
+    public void run()
     {
-        Boolean runServer = true;
-
-        while(runServer)
+        while(true)
         {
             try
             {
-            Socket clientSock = serverSock.accept();
-
-            ObjectInputStream readFromNet = new ObjectInputStream(clientSock.getInputStream());
-
-            Object input = readFromNet.readObject();
-
-            if(input instanceof JoinMessage)
-            {
-
+                (new ReceiverWorker(receiverSock.accept())).start();
             }
-            }
-            catch(IOException e)
+            catch (IOException ex)
             {
-                System.out.println("hi");
+                System.out.println(ex.toString());
             }
-            catch(ClassNotFoundException e)
-            {
-                System.out.println("hi");
-            } 
-
         }
     }
 
 }
-
-// server loop
-    // spawns receiverWorker
