@@ -57,7 +57,7 @@ class Sender
               }
               catch
               {
-                Logger.getLogger(Sender.class.getName()).log(level.SEVERE,"Connection failed", ex);
+                Logger.getLogger(Sender.class.getName()).log(level.SEVERE,"Connection Failed...", ex);
                 continue;
               }
 
@@ -80,23 +80,23 @@ class Sender
               }
                 catch (IOException ex)
                 {
-                Logger.getLogger(Sender.class.getName()).log(level.SEVERE,"Connection failed", ex);)
+                Logger.getLogger(Sender.class.getName()).log(level.SEVERE,"Connection Failed...", ex);)
                 }
                 catch (ClassNotFoundException ex)
                 {
-                Logger.getLogger(Sender.class.getName()).log(level.SEVERE,"Connection failed", ex);
+                Logger.getLogger(Sender.class.getName()).log(level.SEVERE,"Connection Failed...", ex);
                 }
 
                 //send JOINED message to SUCCESSORs PREDECESSOR
                 Socket joinedConnection = null;
                 try
                 {
-                  joinedConnection = new Socket(ChatNode.PREDECESSOR.getAddress())
-                  writeToNet = new ObjectOutputStream(joinedConnection.getOutputStream)
+                  joinedConnection = new Socket(ChatNode.PREDECESSOR.getAddress());
+                  writeToNet = new ObjectOutputStream(joinedConnection.getOutputStream());
                   writeToNet.writeObject(new MessageJoined(ChatNode.ME));
                   joinedConnection.close();
                 } catch (IOException ex) {
-                Logger.getLogger(Sender.class.getName()).log(level.SEVERE,"Connection failed", ex);
+                Logger.getLogger(Sender.class.getName()).log(level.SEVERE,"Connection Failed...", ex);
                   continue;
                 }
                 hasJoined = true;
@@ -104,9 +104,52 @@ class Sender
             }
 
             // if starts with LEAVE
-            else if(inputLine.startsWith("LEAVE"))
+            else if(inputLine.startsWith("LEAVE") || inputLine.startsWith("SHUTDOWN"))
             {
+              if (hasJoined == false)
+              {
+                System.err.println("You have not joined a chat yet ...");
+                continue;
+              }
 
+              // leaving chat
+              MessageLeave leaveMessage = new MessageLeave(ChatNode.PREDECESSOR);
+              Socket leaveConnection = null;
+
+              try {
+                leaveConnection = new Socket(ChatNode.SUCCESSOR.getAddress(), ChatNode.SUCCESSOR)
+                writeToNet = new ObjectOutputStream(leaveConnection.getOutputStream());
+                writeToNet.writeObject(leaveMessage);
+                leaveConnection.close();
+              } catch (IOException ex) {
+                Logger.getLogger(Sender.class.getName()).log(Level.SEVERE,"CONnection failed!", ex);
+                continue;
+              }
+
+              MessageLeft leftMessage = new MessageLeft(ChatNode.SUCCESSOR);
+              Socket leftConnection = null;
+
+              try {
+                leftConnection = new Socket(ChatNode.PREDECESSOR.getAddress(),)
+                writeToNet = new ObjectOutputStream(leftConnection.getOutputStream())
+                writeToNet.writeObject(leftMessage);
+                leftConnection.close();
+              } catch (IOException ex) {
+                Logger.getLogger(Sender.class.getName()).log(Level.SEVERE, "Connection failed!", ex);
+                continue;
+              }
+
+              if (inputLine.startsWith("LEAVE"))
+              {
+                hasJoined = false;
+                System.out.println("Left chat");
+              }
+              else
+              {
+                // shut down
+                System.out.println("Shutting down\n");
+                System.exit(0);
+              }
             }
 
             // otherwise, send message
@@ -117,22 +160,21 @@ class Sender
               {
                 System.err.println("You need to join chat first!");
                 continue;
-
               }
-              Socket noteConnection;
+              Socket messageConnection;
               Onject[] noteMessageContent = new Object[2];
               noteMessageContent[0] = ChatNode.self;
               noteMessageContent[1] = ChatNode.self.getName() + ": " + inputLine
               MessageNote noteMessage = new MessageNote(noteMessageContent);
               //send note message to this participant
               try{
-                noteConnection = new Socket(ChatNode.SUCCESSOR.getAddress)
-                writeToNet = new ObjectOutputStream(noteConnection.getOutputStream)
+                messageConnection = new Socket(ChatNode.SUCCESSOR.getAddress());
+                writeToNet = new ObjectOutputStream(messageConnection.getOutputStream());
                 writeToNet.writeObject(noteMessage);
-                noteConnection.close();
+                messageConnection.close();
               } catch(IOException ex)
               {
-                Logger.getLogger(Sender.class.getName()).log(level.SEVERE,"Connection failed", ex);
+                Logger.getLogger(Sender.class.getName()).log(level.SEVERE,"Connection Failed... ", ex);
               }
             }
 
