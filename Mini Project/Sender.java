@@ -72,15 +72,15 @@ class Sender
                 writeToNet.writeObject(new MessageJoin(ChatNode.self));
 
                 //recieve SUCCESSOR INFO
-                ChatNode.SUCCESSOR = (NodeInfo)readFromNet.readObject()
-                ChatNode.PREDECESSOR = (NodeInfo)readFromNet.readObject()
+                ChatNode.SUCCESSOR = (NodeInfo)readFromNet.readObject();
+                ChatNode.PREDECESSOR = (NodeInfo)readFromNet.readObject();
 
                 //done
                 joinConnection.close();
               }
                 catch (IOException ex)
                 {
-                Logger.getLogger(Sender.class.getName()).log(level.SEVERE,"Connection failed", ex);)
+                Logger.getLogger(Sender.class.getName()).log(level.SEVERE,"Connection failed", ex));
                 }
                 catch (ClassNotFoundException ex)
                 {
@@ -91,8 +91,8 @@ class Sender
                 Socket joinedConnection = null;
                 try
                 {
-                  joinedConnection = new Socket(ChatNode.PREDECESSOR.getAddress())
-                  writeToNet = new ObjectOutputStream(joinedConnection.getOutputStream)
+                  joinedConnection = new Socket(ChatNode.PREDECESSOR.getAddress());
+                  writeToNet = new ObjectOutputStream(joinedConnection.getOutputStream);
                   writeToNet.writeObject(new MessageJoined(ChatNode.ME));
                   joinedConnection.close();
                 } catch (IOException ex) {
@@ -122,12 +122,12 @@ class Sender
               Socket noteConnection;
               Onject[] noteMessageContent = new Object[2];
               noteMessageContent[0] = ChatNode.self;
-              noteMessageContent[1] = ChatNode.self.getName() + ": " + inputLine
+              noteMessageContent[1] = ChatNode.self.getName() + ": " + inputLine;
               MessageNote noteMessage = new MessageNote(noteMessageContent);
               //send note message to this participant
               try{
-                noteConnection = new Socket(ChatNode.SUCCESSOR.getAddress)
-                writeToNet = new ObjectOutputStream(noteConnection.getOutputStream)
+                noteConnection = new Socket(ChatNode.SUCCESSOR.getAddress);
+                writeToNet = new ObjectOutputStream(noteConnection.getOutputStream);
                 writeToNet.writeObject(noteMessage);
                 noteConnection.close();
               } catch(IOException ex)

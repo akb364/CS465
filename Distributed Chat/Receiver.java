@@ -6,13 +6,15 @@ public class Receiver extends Thread implements Serializable
 {
 
     static ServerSocket receiverSock;
+    ChatNode me = null;
 
-    public Receiver(Participant myInfo)
+    public Receiver(ChatNode me)
     {
         try
         {
-            receiverSock = new ServerSocket(myInfo.port);
-            System.out.println("Receiver socket created on port " + myInfo.port);
+            this.me = me;
+            receiverSock = new ServerSocket(me.self.port);
+            System.out.println("Receiver socket created on port " + me.self.port);
         }
         catch (IOException ex)
         {
@@ -27,7 +29,7 @@ public class Receiver extends Thread implements Serializable
         {
             try
             {
-                (new ReceiverWorker(receiverSock.accept())).start();
+                (new ReceiverWorker(receiverSock.accept(), this.me)).start();
             }
             catch (IOException ex)
             {
