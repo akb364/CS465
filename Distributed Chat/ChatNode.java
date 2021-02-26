@@ -23,7 +23,7 @@ public class ChatNode
 
         }
 
-        this.self = new Participant(ip, serverSock.getLocalPort());
+        this.self = new Participant("name", ip, serverSock.getLocalPort());
         this.participantList = new LinkedList<Participant>();
 
         //this.sender = new Sender(this.self);
@@ -42,25 +42,26 @@ public class ChatNode
         // if user gives other ip & port
         if( args.length > 1 )
         {
-            System.out.println("hi");
-
             String otherNodeIP = args[0];
             int otherNodePort = Integer.parseInt(args[1]);
 
-            node.connectToMesh(new Participant(otherNodeIP, otherNodePort));
+            //node.connectToMesh(new Participant(otherNodeIP, otherNodePort));
         }
-
-        //runReceiver();
 
         System.out.println("done message");
     }
+
+    /*void run()
+    {
+        receiver = new Receiver();
+    }*/
 
 }
 
 class Participant
 {
     public String ip;
-    public Sring name;
+    public String name;
     public int port;
 
     public Participant(String name, String ip, int port)
