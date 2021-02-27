@@ -5,16 +5,14 @@ import java.io.*;
 public class Receiver extends Thread implements Serializable
 {
 
-    static ServerSocket receiverSock;
-    ChatNode me = null;
+    private ServerSocket receiverSock;
 
-    public Receiver(ChatNode me)
+    public Receiver()
     {
         try
         {
-            this.me = me;
-            receiverSock = new ServerSocket(me.self.port);
-            System.out.println("Receiver socket created on port " + me.self.port);
+            receiverSock = new ServerSocket(0);
+            System.out.println("Receiver socket created on port " + receiverSock.getLocalPort());
         }
         catch (IOException ex)
         {
@@ -29,7 +27,7 @@ public class Receiver extends Thread implements Serializable
         {
             try
             {
-                (new ReceiverWorker(receiverSock.accept(), this.me)).start();
+                (new ReceiverWorker(receiverSock.accept())).start();
             }
             catch (IOException ex)
             {

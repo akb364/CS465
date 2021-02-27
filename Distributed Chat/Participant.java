@@ -10,4 +10,10 @@ public class Participant
         this.name = name;
         this.port = port;
     }
+
+    public Participant(String name, String ip)
+    {
+        this.ip = ip;
+        this.name = name;
+    }
 }

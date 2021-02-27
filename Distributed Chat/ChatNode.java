@@ -6,55 +6,38 @@ public class ChatNode
 {
     public static Participant self;
     public static LinkedList<Participant> participantList;
-    private Socket sock;
-    private ServerSocket serverSock; 
     //private Sender sender;
     private Receiver receiver;
-    String ip;
-    String otherNodeIP;
-    int otherNodePort;
-
 
     public ChatNode(String[] args)
     {
-        // create a new server socket with generated port
-        try
+        // args will be: username, ip
+        // JOIN message will be sent later in a separate command
+
+        if( args.length >= 2 )
         {
-            serverSock = new ServerSocket(0);
+            this.self = new Participant(args[0], args[1]);
         }
-        catch(IOException e)
+        else
         {
-
+            System.out.println("not enough args");
+            System.exit(1);
         }
-
-        if( args.length > 1 )
-        {
-            ip = args[0];
-            otherNodeIP = args[1];
-            otherNodePort = Integer.parseInt(args[2]);
-            
-
-            //node.connectToMesh(new Participant(otherNodeIP, otherNodePort));
-        }
-
-        this.self = new Participant("name", ip, serverSock.getLocalPort());
-        this.participantList = new LinkedList<Participant>();
-
-
     }
 
     public static void main(String[] args)
     {
         ChatNode node = new ChatNode(args);
+        node.run();
     }
 
     public void run()
     {
-        System.out.println("listening on port " + Integer.toString(this.self.port));
-
-        new Receiver(this).start();
+        new Receiver().start();
+        // new Sender().start();
 
         System.out.println("done message");
+        System.exit(0);
     }
 
 }
