@@ -6,7 +6,7 @@ public class ChatNode
 {
     public static Participant self;
     public static LinkedList<Participant> participantList;
-    //private Sender sender;
+    private Sender sender;
     private Receiver receiver;
 
     public ChatNode(String[] args)
@@ -34,25 +34,10 @@ public class ChatNode
     public void run()
     {
         new Receiver().start();
-        // new Sender().start();
+        new Sender().start();
 
         System.out.println("done message");
         System.exit(0);
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
