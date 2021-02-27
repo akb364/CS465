@@ -36,8 +36,6 @@ public class ChatNode
         new Receiver().start();
         new Sender().start();
 
-        System.out.println("done message");
-        System.exit(0);
     }
 
 }

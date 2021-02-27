@@ -1,5 +1,7 @@
+import java.io.*;
+
 // chat message sent from one node to all others
-public class ChatMessage extends MessageType
+public class ChatMessage extends MessageType implements Serializable
 {
     public String message;
 

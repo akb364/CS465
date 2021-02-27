@@ -1,5 +1,7 @@
+import java.io.*;
+
 // base class
-public class MessageType
+public class MessageType implements Serializable
 {
     public Participant sender;
 

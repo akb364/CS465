@@ -11,6 +11,7 @@ public class ReceiverWorker extends Thread
 
     public ReceiverWorker(Socket peerConnection)
     {
+        System.out.println("yo");
         this.peerConnection = peerConnection;
         try
         {

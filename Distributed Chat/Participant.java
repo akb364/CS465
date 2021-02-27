@@ -1,4 +1,6 @@
-public class Participant
+import java.io.*;
+
+public class Participant implements Serializable
 {
     public String ip;
     public String name;
