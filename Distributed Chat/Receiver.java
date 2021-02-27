@@ -12,6 +12,7 @@ public class Receiver extends Thread implements Serializable
         try
         {
             receiverSock = new ServerSocket(0);
+            ChatNode.self.port = receiverSock.getLocalPort();
             System.out.println("Receiver socket created on port " + receiverSock.getLocalPort());
         }
         catch (IOException ex)
