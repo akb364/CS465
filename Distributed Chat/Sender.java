@@ -5,7 +5,6 @@ import java.io.*;
 // only one thread
 // can ask to join or leave or send message
 class Sender extends Thread implements Serializable {
-    //private Participant self;
     public static boolean hasJoined;
 
     public Sender() 
@@ -16,10 +15,10 @@ class Sender extends Thread implements Serializable {
     @Override
     public void run() 
     {
+        // get user input
         Scanner userInput = new Scanner(System.in);
         System.out.print("Commands: JOIN, LEAVE\n");
         String inputLine = "";
-        
 
         // loop - runs until SHUTDOWN
         while (true) 
@@ -35,14 +34,14 @@ class Sender extends Thread implements Serializable {
                     System.err.println("You have already joined the chat..");
                     continue;
                 }
+
+                // get ip and port from user
                 String[] connectionInfo = inputLine.split(" ");
                 String joinAddress = "";
                 int joinPort = 0;
-                String joinName = "";
                 
                 try 
                 {
-                    joinName = connectionInfo[0];
                     joinAddress = connectionInfo[1];
                     joinPort = Integer.parseInt(connectionInfo[2]);
                 } 
@@ -50,6 +49,7 @@ class Sender extends Thread implements Serializable {
                 {
                     System.out.println(ex.toString());
                 }
+                // connect
                 Socket joinConnection;
                 try 
                 {
@@ -90,7 +90,8 @@ class Sender extends Thread implements Serializable {
 
                 Socket joinedConnection = null;
                 hasJoined = true;
-                
+
+                // loop through participant list and send joinedMessage
                 try 
                 {
                     for (int index = 0; index < ChatNode.participantList.size(); index++) 
@@ -122,6 +123,7 @@ class Sender extends Thread implements Serializable {
                 LeaveMessage leaveMessage = new LeaveMessage(ChatNode.self);
                 Socket leaveConnection = null;
 
+                // loop though participantList and send leave message
                 try 
                 {
                     for (int index = 0; index < ChatNode.participantList.size(); index++) 
@@ -163,11 +165,8 @@ class Sender extends Thread implements Serializable {
                 }
 
                 Socket messageConnection;
-                // Object[] noteMessageContent = new Object[2];
-                // noteMessageContent[0] = ChatNode.self;
-                // noteMessageContent[1] = ChatNode.self.name + ": " + inputLine;
-                // ChatMessage noteMessage = new ChatMessage(ChatNode.self, inputLine);
-                //send note message to this participant
+
+                // send message to each participant
                 try 
                 {
                     for (int index = 0; index < ChatNode.participantList.size(); index++) 

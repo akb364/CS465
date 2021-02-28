@@ -12,6 +12,7 @@ public class ReceiverWorker extends Thread
     public ReceiverWorker(Socket peerConnection)
     {
         this.peerConnection = peerConnection;
+
         try
         {
             readFromNet = new ObjectInputStream(peerConnection.getInputStream());
@@ -28,6 +29,7 @@ public class ReceiverWorker extends Thread
     {
         try
         {
+            // read message from connection
             message = readFromNet.readObject();
         }
         catch (Exception ex)
@@ -40,14 +42,21 @@ public class ReceiverWorker extends Thread
         {
             try
             {
+                // make participants list to send
+                // with local list + self
                 LinkedList<Participant> participants = new LinkedList<Participant>();
                 participants.add(ChatNode.self);
-                Sender.hasJoined = true;
+
                 if (ChatNode.participantList.size() != 0)
                 {
                     participants.addAll(ChatNode.participantList);  
                 }
+
+                // send message to joining node
                 writeToNet.writeObject(new ParticipantsMessage(participants));
+
+                Sender.hasJoined = true;
+
             }
             catch (IOException ex)
             {
@@ -57,13 +66,17 @@ public class ReceiverWorker extends Thread
         
         else if(message instanceof JoinedMessage)
         {
+            // add joining node to participant list
             JoinedMessage joined = (JoinedMessage) message;
+
             ChatNode.participantList.add(joined.sender);
+
             System.out.println(joined.sender.name + " has joined!");
         }
 
         else if(message instanceof LeaveMessage)
         {
+            // find leaving node and remove it from participantsList
             LeaveMessage leave = (LeaveMessage) message;
             for(int index = 0; index < ChatNode.participantList.size(); index++)
             {
@@ -74,14 +87,12 @@ public class ReceiverWorker extends Thread
                 }
             }
 
-            // System.out.println(ChatNode.participantList.size());
-            // ChatNode.participantList.remove(leave.sender);
-            // System.out.println(ChatNode.participantList.size());
             System.out.println(leave.sender.name + " has left!");
         }
 
         else if(message instanceof ChatMessage)
         {
+            // display chat message
             ChatMessage chat = (ChatMessage) message;
             System.out.println(chat.sender.name + ": " + chat.message);
         }

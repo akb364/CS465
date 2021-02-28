@@ -1,6 +1,6 @@
 import java.io.*;
 
-// base class
+// base message class
 public class MessageType implements Serializable
 {
     public Participant sender;
