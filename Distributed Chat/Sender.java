@@ -5,7 +5,7 @@ import java.io.*;
 // only one thread
 // can ask to join or leave or send message
 class Sender extends Thread implements Serializable {
-    private Participant self;
+    //private Participant self;
 
     public Sender() 
     {
@@ -60,7 +60,7 @@ class Sender extends Thread implements Serializable {
 
                     continue;
                 }
-
+                ParticipantsMessage participants;
                 //send join request
                 try 
                 {
@@ -71,22 +71,33 @@ class Sender extends Thread implements Serializable {
                     //send join request
                     writeToNet.writeObject(new JoinMessage(ChatNode.self));
 
+                    // read object
+                    participants = (ParticipantsMessage) readFromNet.readObject();
+
+                    ChatNode.participantList = participants.participantList;
+
                     //done
                     joinConnection.close();
                 } 
-                catch (IOException ex) 
+                catch (ClassNotFoundException ex) 
                 {
                     System.out.println(ex.toString());
                 }
+                catch (IOException ex)
+                {
+                    System.out.println(ex.toString());
+                }
+
                 Socket joinedConnection = null;
+                hasJoined = true;
+
                 try 
                 {
-
                     for (int index = 0; index < ChatNode.participantList.size(); index++) 
                     {
-                        joinedConnection = new Socket(ChatNode.self.ip, ChatNode.self.port);
+                        joinedConnection = new Socket(ChatNode.participantList.get(index).ip, ChatNode.participantList.get(index).port);
                         ObjectOutputStream writeToNet = new ObjectOutputStream(joinedConnection.getOutputStream());
-                        writeToNet.writeObject(new JoinMessage(ChatNode.self));
+                        writeToNet.writeObject(new JoinedMessage(ChatNode.self));
                         joinedConnection.close();
                     }
 
@@ -95,8 +106,6 @@ class Sender extends Thread implements Serializable {
                     System.out.println(ex.toString());
                     continue;
                 }
-                hasJoined = true;
-
             }
 
             // if starts with LEAVE
@@ -116,13 +125,14 @@ class Sender extends Thread implements Serializable {
                 {
                     for (int index = 0; index < ChatNode.participantList.size(); index++) 
                     {
-                        leaveConnection = new Socket(ChatNode.self.ip, ChatNode.self.port);
+                        leaveConnection = new Socket(ChatNode.participantList.get(index).ip, ChatNode.participantList.get(index).port);
                         ObjectOutputStream writeToNet = new ObjectOutputStream(leaveConnection.getOutputStream());
                         writeToNet.writeObject(leaveMessage);
                         leaveConnection.close();
                     }
 
-                } catch (IOException ex) 
+                } 
+                catch (IOException ex) 
                 {
                     System.out.println(ex.toString());
                     continue;
@@ -132,7 +142,9 @@ class Sender extends Thread implements Serializable {
                 {
                     hasJoined = false;
                     System.out.println("Left chat");
-                } else {
+                } 
+                else 
+                {
                     // shut down
                     System.out.println("Shutting down\n");
                     System.exit(0);
@@ -158,7 +170,7 @@ class Sender extends Thread implements Serializable {
                 {
                     for (int index = 0; index < ChatNode.participantList.size(); index++) 
                     {
-                        messageConnection = new Socket(ChatNode.self.ip, ChatNode.self.port);
+                        messageConnection = new Socket(ChatNode.participantList.get(index).ip, ChatNode.participantList.get(index).port);
                         ObjectOutputStream writeToNet = new ObjectOutputStream(messageConnection.getOutputStream());
                         writeToNet.writeObject(noteMessage);
                         messageConnection.close();

@@ -11,7 +11,6 @@ public class ReceiverWorker extends Thread
 
     public ReceiverWorker(Socket peerConnection)
     {
-        System.out.println("yo");
         this.peerConnection = peerConnection;
         try
         {
@@ -20,7 +19,7 @@ public class ReceiverWorker extends Thread
         }
         catch(IOException ex)
         {
-            System.out.println("Message could not be read from obj stream");
+            System.out.println("connection could not be established");
             System.exit(1);
         }
     }
@@ -30,7 +29,6 @@ public class ReceiverWorker extends Thread
         try
         {
             message = readFromNet.readObject();
-            
         }
         catch (Exception ex)
         {
@@ -40,21 +38,27 @@ public class ReceiverWorker extends Thread
 
         if(message instanceof JoinMessage)
         {
-                try
+            try
+            {
+                LinkedList<Participant> participants = new LinkedList<Participant>();
+                participants.add(ChatNode.self);
+                if (ChatNode.participantList.size() != 0)
                 {
-                    writeToNet.writeObject(new ParticipantsMessage(ChatNode.participantList));
+                    participants.addAll(ChatNode.participantList);  
                 }
-                catch (IOException ex)
-                {
-                    System.out.println(ex.toString());
-                }
+                writeToNet.writeObject(new ParticipantsMessage(participants));
+            }
+            catch (IOException ex)
+            {
+                System.out.println(ex.toString());
+            }
         }
         
         else if(message instanceof JoinedMessage)
         {
             JoinedMessage joined = (JoinedMessage) message;
-            ChatNode.participantList.add(joined.newNode);
-            System.out.println(joined.newNode.name + " has joined!");
+            ChatNode.participantList.add(joined.sender);
+            System.out.println(joined.sender.name + " has joined!");
         }
 
         else if(message instanceof LeaveMessage)

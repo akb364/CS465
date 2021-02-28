@@ -17,6 +17,8 @@ public class ChatNode
         if( args.length >= 2 )
         {
             this.self = new Participant(args[0], args[1]);
+            this.participantList = new LinkedList<Participant>();
+            //this.participantList.add(this.self);
         }
         else
         {

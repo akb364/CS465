@@ -5,11 +5,9 @@ import java.io.*;
 // can add the node to their participants list
 public class JoinedMessage extends MessageType implements Serializable
 {
-    public Participant newNode;
 
-    JoinedMessage(Participant sender,Participant newNode)
+    JoinedMessage(Participant sender)
     {
         super(sender);
-        newNode = newNode;
     }
 }
