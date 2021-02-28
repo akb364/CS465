@@ -42,6 +42,7 @@ public class ReceiverWorker extends Thread
             {
                 LinkedList<Participant> participants = new LinkedList<Participant>();
                 participants.add(ChatNode.self);
+                Sender.hasJoined = true;
                 if (ChatNode.participantList.size() != 0)
                 {
                     participants.addAll(ChatNode.participantList);  
@@ -64,7 +65,18 @@ public class ReceiverWorker extends Thread
         else if(message instanceof LeaveMessage)
         {
             LeaveMessage leave = (LeaveMessage) message;
-            ChatNode.participantList.remove(leave.sender);
+            for(int index = 0; index < ChatNode.participantList.size(); index++)
+            {
+                String leave_name = leave.sender.name;
+                if(ChatNode.participantList.get(index).name.equals(leave_name))
+                {
+                    ChatNode.participantList.remove(index);
+                }
+            }
+
+            // System.out.println(ChatNode.participantList.size());
+            // ChatNode.participantList.remove(leave.sender);
+            // System.out.println(ChatNode.participantList.size());
             System.out.println(leave.sender.name + " has left!");
         }
 

@@ -8,6 +8,7 @@ public class ChatNode
     public static LinkedList<Participant> participantList;
     private Sender sender;
     private Receiver receiver;
+    
 
     public ChatNode(String[] args)
     {

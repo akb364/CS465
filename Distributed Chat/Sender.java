@@ -6,10 +6,11 @@ import java.io.*;
 // can ask to join or leave or send message
 class Sender extends Thread implements Serializable {
     //private Participant self;
+    public static boolean hasJoined;
 
     public Sender() 
     {
-
+        this.hasJoined = false;
     }
 
     @Override
@@ -18,7 +19,7 @@ class Sender extends Thread implements Serializable {
         Scanner userInput = new Scanner(System.in);
         System.out.print("Commands: JOIN, LEAVE\n");
         String inputLine = "";
-        boolean hasJoined = false;
+        
 
         // loop - runs until SHUTDOWN
         while (true) 
@@ -73,7 +74,6 @@ class Sender extends Thread implements Serializable {
 
                     // read object
                     participants = (ParticipantsMessage) readFromNet.readObject();
-
                     ChatNode.participantList = participants.participantList;
 
                     //done
@@ -90,7 +90,7 @@ class Sender extends Thread implements Serializable {
 
                 Socket joinedConnection = null;
                 hasJoined = true;
-
+                
                 try 
                 {
                     for (int index = 0; index < ChatNode.participantList.size(); index++) 
@@ -98,6 +98,7 @@ class Sender extends Thread implements Serializable {
                         joinedConnection = new Socket(ChatNode.participantList.get(index).ip, ChatNode.participantList.get(index).port);
                         ObjectOutputStream writeToNet = new ObjectOutputStream(joinedConnection.getOutputStream());
                         writeToNet.writeObject(new JoinedMessage(ChatNode.self));
+                        writeToNet.close();
                         joinedConnection.close();
                     }
 
@@ -142,6 +143,7 @@ class Sender extends Thread implements Serializable {
                 {
                     hasJoined = false;
                     System.out.println("Left chat");
+                    ChatNode.participantList = new LinkedList<Participant>();
                 } 
                 else 
                 {
@@ -154,22 +156,26 @@ class Sender extends Thread implements Serializable {
             // otherwise, send message
             else 
             {
-                if (hasJoined = false) 
+                if (hasJoined == false) 
                 {
                     System.err.println("You need to join chat first!");
                     continue;
                 }
 
                 Socket messageConnection;
-                Object[] noteMessageContent = new Object[2];
-                noteMessageContent[0] = ChatNode.self;
-                noteMessageContent[1] = ChatNode.self.name + ": " + inputLine;
-                ChatMessage noteMessage = new ChatMessage(ChatNode.self, inputLine);
+                // Object[] noteMessageContent = new Object[2];
+                // noteMessageContent[0] = ChatNode.self;
+                // noteMessageContent[1] = ChatNode.self.name + ": " + inputLine;
+                // ChatMessage noteMessage = new ChatMessage(ChatNode.self, inputLine);
                 //send note message to this participant
                 try 
                 {
                     for (int index = 0; index < ChatNode.participantList.size(); index++) 
                     {
+                        Object[] noteMessageContent = new Object[2];
+                        noteMessageContent[0] = ChatNode.self;
+                        noteMessageContent[1] = ChatNode.self.name + ": " + inputLine;
+                        ChatMessage noteMessage = new ChatMessage(ChatNode.self, inputLine);
                         messageConnection = new Socket(ChatNode.participantList.get(index).ip, ChatNode.participantList.get(index).port);
                         ObjectOutputStream writeToNet = new ObjectOutputStream(messageConnection.getOutputStream());
                         writeToNet.writeObject(noteMessage);
