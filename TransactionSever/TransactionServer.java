@@ -1,0 +1,60 @@
+import java.net.*;
+import java.io.*;
+import java.util.*;
+import java.lang.*;
+
+public class TransactionServer extends Thread implements Serializable
+{
+    private ServerSocket serverSock;
+    private InetAddress ip;
+    private int port;
+
+    // constructor
+    public TransactionServer()
+    {
+        try (InputStream input = new FileInputStream("TransactionSever.properties")) {
+
+            Properties prop = new Properties();
+
+            // load a properties file
+            prop.load(input);
+
+            // get the property values
+            String strIP = prop.getProperty("HOST");
+            this.ip = InetAddress.getByName(strIP);
+            this.port = Integer.parseInt(prop.getProperty("PORT"));
+
+            serverSock = new ServerSocket(port, 50, ip);
+
+            System.out.println("Server listening with ip=" + 
+                               strIP + " and port=" + prop.getProperty("PORT"));
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @Override
+    public void run()
+    {
+        // server loop
+        while(true)
+        {
+            try
+            {
+                TransactionManager.getInstance().runTransaction(serverSock.accept());
+            }
+            catch (IOException ex)
+            {
+                System.out.println(ex.toString());
+            }
+        }
+    }
+
+    public static void main(String[] args)
+    {
+        new TransactionServer().start();
+    }
+
+
+}
