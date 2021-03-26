@@ -6,6 +6,6 @@ public class MsgReadRequest implements Serializable
 
     public MsgReadRequest(int accountNumber)
     {
-        this.acccountNumber = accountNumber;
+        this.accountNumber = accountNumber;
     }
 }
