@@ -1,3 +1,7 @@
+import java.io.*;
+import java.util.*;
+import java.net.*;
+
 public class TransactionServerProxy 
 {
     private Boolean transactionIsOpen;
@@ -6,25 +10,34 @@ public class TransactionServerProxy
     private ObjectOutputStream writeToNet;
     private ObjectInputStream readFromNet;
     private int serverPort;
+    private InetAddress ip;
 
     // constructor
-    public TransactionServerProxy(int serverPort)
+    public TransactionServerProxy(String ip, int serverPort)
     {
         this.transactionIsOpen = false;
         this.serverPort = serverPort;
+        try
+        {
+            this.ip = InetAddress.getByName(ip);
+        }
+        catch (UnknownHostException ex)
+        {
+            System.out.println(ex.toString());
+        }
     }
 
-    public void openTransaction()
+    public int openTransaction()
     {
         // check if transaction is already opened
         if (transactionIsOpen)
         {
             System.out.println("Transaction is already open!");
-            return;
+            return -1;
         }
         try
         {
-            connection = new Socket(serverPort);
+            connection = new Socket(ip, serverPort);
 
             // open connection with server
             writeToNet = new ObjectOutputStream(connection.getOutputStream());
@@ -40,12 +53,13 @@ public class TransactionServerProxy
         }
         catch (Exception e)
         {
-            System.out.println("Failed to open transaction.");
-            return;
+            return -1;
         }
         System.out.println("Transaction successfully opened.");
 
         transactionIsOpen = true;
+
+        return transactionID;
     }
 
     public void closeTransaction()
@@ -75,7 +89,7 @@ public class TransactionServerProxy
         if(!transactionIsOpen)
         {
             System.out.println("Transaction is not open!");
-            return;
+            return -1;
         }
         try
         {
@@ -84,7 +98,7 @@ public class TransactionServerProxy
             readFromNet = new ObjectInputStream(connection.getInputStream());
 
             // send message
-            writeToNet.writeObject(new MsgReadRequest());
+            writeToNet.writeObject(new MsgReadRequest(accountNumber));
 
             // get response
             MsgAccountBalance message = (MsgAccountBalance)readFromNet.readObject();

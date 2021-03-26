@@ -7,7 +7,8 @@ public class TransactionServer extends Thread implements Serializable
 {
     private ServerSocket serverSock;
     private InetAddress ip;
-    private int port;
+    private int port, numAccounts, initialBalance;
+    private Boolean applyLocking, transactionView;
 
     // constructor
     public TransactionServer()
@@ -23,6 +24,10 @@ public class TransactionServer extends Thread implements Serializable
             String strIP = prop.getProperty("HOST");
             this.ip = InetAddress.getByName(strIP);
             this.port = Integer.parseInt(prop.getProperty("PORT"));
+            this.numAccounts = Integer.parseInt(prop.getProperty("NUMBER_ACCOUNTS"));
+            this.initialBalance = Integer.parseInt(prop.getProperty("INITIAL_BALANCE"));
+            this.applyLocking = Boolean.parseBoolean(prop.getProperty("APPLY_LOCKING"));
+            this.transactionView = Boolean.parseBoolean(prop.getProperty("TRANSACTION_VIEW"));
 
             serverSock = new ServerSocket(port, 50, ip);
 
@@ -32,6 +37,8 @@ public class TransactionServer extends Thread implements Serializable
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+
+        // NEED TO INITIALIZE ACCOUNTS HERE
     }
 
     @Override
