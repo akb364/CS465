@@ -20,7 +20,7 @@ public class Account {
         return this.balance;
     }
 
-    public transferRandAmount()
+    public void transferRandAmount()
     {
         
     }

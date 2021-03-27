@@ -4,6 +4,7 @@ import java.util.Hashtable;
 public class LockManager {
 
     private Hashtable theLocks;
+    private static LockManager INSTANCE;
 
     public void setLock(Object object, Trans trans, LockType lockType)
     {
@@ -26,5 +27,17 @@ public class LockManager {
             }
         }
     }
+
+    public static LockManager getInstance()
+    {
+        if(INSTANCE == null)
+        {
+            INSTANCE = new LockManager();
+        }
+
+        return INSTANCE;
+    }
+
+
 
 }

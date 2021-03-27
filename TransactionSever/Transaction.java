@@ -5,29 +5,29 @@ public class Transaction {
 
 	}
 
-	public openTransaction(transactionID)
+	public void openTransaction(int transactionID)
 	{
 
 	}
 
-	public int readAccount(accountNum)
+	public int readAccount(int accountNum)
     {
-        
+        return 0;
     }
 
-    public void writeToAccount( accountNum, int amount)
+    public void writeToAccount( int accountNum, int amount)
     {
 
     }  
 
-	public closeTransaction()
+	public int closeTransaction()
 	{
-
+		return 0;
 	} 
       
-	public transferRandAmount()
+	public int transferRandAmount()
     {
-
+		return 0;
     } 
 
 }
