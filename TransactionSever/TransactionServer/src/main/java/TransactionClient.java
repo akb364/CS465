@@ -34,11 +34,11 @@ public class TransactionClient extends Thread
     public void run()
     {
         TransactionServerProxy serverProxy = new TransactionServerProxy(ip, port);
-        serverProxy.openTransaction();
+        int transID = serverProxy.openTransaction();
 
         // stuff
 
-        serverProxy.closeTransaction();
+        serverProxy.closeTransaction(transID);
     }
 
     public static void main(String[] args)

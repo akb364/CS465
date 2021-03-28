@@ -6,8 +6,7 @@ public class Lock {
     private Vector holders;
     private LockType lockType;
 
-
-    public synchronized void acquire(Trans trans, LockType aLockType)
+    public synchronized void acquire(Transaction trans, LockType lockType)
     {
         // while(/* another transaction holds the lock in conflicting mode*/)
         // {
@@ -30,7 +29,7 @@ public class Lock {
         // }
     }
 
-    public synchronized void release(TransID trans) 
+    public synchronized void release(Transaction trans) 
     {
         // holders.removeElement(trans);       // remove this holder
         // // set locktype to none

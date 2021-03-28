@@ -6,7 +6,7 @@ public class LockManager {
     private Hashtable theLocks;
     private static LockManager INSTANCE;
 
-    public void setLock(Object object, Trans trans, LockType lockType)
+    public void setLock(Object object, Transaction trans, LockType lockType)
     {
         Lock foundLock;
         synchronized(this) {

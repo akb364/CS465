@@ -1,22 +1,40 @@
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.util.ArrayList;
+import java.util.Properties;
 
-public class AccountManager implements LockTypes
+public class AccountManager implements LockType
 {
-    
     private static ArrayList<Account> accounts;
     static int numberAccounts;
     static int initialBalance; 
     private static AccountManager INSTANCE;
-   // private lockManager = new LockManager();
 
-    public AccountManager(int numberAccounts, int initialBalance)
+    public AccountManager()
     {
-        accounts = new ArrayList();
-        AccountManager.numberAccounts = numberAccounts;
-        AccountManager.initialBalance = initialBalance;
-        int accountIndex;
+        try (InputStream input = new FileInputStream("TransactionSever.properties")) {
 
-        for(accountIndex = 0; accountIndex < numberAccounts; accountIndex++)
+            Properties prop = new Properties();
+
+            // load a properties file
+            prop.load(input);
+            
+            this.numberAccounts = Integer.parseInt(prop.getProperty("NUMBER_ACCOUNTS"));
+            this.initialBalance = Integer.parseInt(prop.getProperty("INITIAL_BALANCE"));
+
+        } 
+        catch (IOException ex) 
+        {
+            ex.printStackTrace();
+        }
+        accounts = new ArrayList();
+        this.numberAccounts = numberAccounts;
+        this.initialBalance = initialBalance;
+        
+        for(int accountIndex = 0; accountIndex < numberAccounts; accountIndex++)
         {
             accounts.add(accountIndex, new Account(accountIndex, initialBalance));
         }
@@ -38,7 +56,7 @@ public class AccountManager implements LockTypes
         Account account = getAccount(accountNum);
 
         // set read lock and wait until lock is free
-        (TransactionServer.lockManager).lock(account, transaction, READ_LOCK);
+        LockManager.getInstance().lock(account, transaction, LockType.READ_LOCK);
 
         // return when lock is released
         return (getAccount(accountNum)).getBalance();
@@ -50,7 +68,7 @@ public class AccountManager implements LockTypes
         Account account = getAccount(accountNum);
 
         // set write lock and wait until lock is free
-        LockManager.getInstance().lock(account, transaction, WRITE_LOCK);
+        LockManager.getInstance().lock(account, transaction, LockType.WRITE_LOCK);
         
         // write amount
         account.setBalance(balance);

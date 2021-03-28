@@ -1,25 +1,20 @@
 import java.util.ArrayList;
+import java.net.*;
 
 public class TransactionManager 
 {
-    private static int transactionCounter = 0;
+    public int transactionCounter = 0;
     private static TransactionManager INSTANCE;
-    private static final ArrayList<Transaction> transactions = new ArrayList<Transaction>();
-
+    public ArrayList<Transaction> transactions;
 
     public TransactionManager()
     {
-
-    }
-
-    public ArrayList<transaction> getTransactions()
-    {
-      return transactions;
+        transactions = new ArrayList<Transaction>();
     }
 
     public void runTransaction(Socket client)
     {
-      (new TransactionManagerWorker(client)).start();
+      new TransactionManagerWorker(client).start();
     }
 
     public static TransactionManager getInstance()
