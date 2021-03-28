@@ -9,7 +9,6 @@ public class ChatNode
     private Sender sender;
     private Receiver receiver;
     
-
     public ChatNode(String[] args)
     {
         // args will be: username, ip
