@@ -91,7 +91,7 @@ public class TransactionManagerWorker extends Thread
 
                 try
                 {
-                    writeToNet.writeObject((Integer) balance);
+                    writeToNet.writeObject(new MsgAccountBalance(balance));
                 } 
                 catch (IOException e) 
                 {
@@ -101,7 +101,7 @@ public class TransactionManagerWorker extends Thread
                 //transaction.log("[TransactionWorker.run] READ_REQUEST <<<<<<<<<<<< account #: " + accountNumber + " balance: " + balance);
             }
 
-            if(message instanceof MsgReadRequest)
+            if(message instanceof MsgWriteRequest)
             {
                 MsgWriteRequest msg = (MsgWriteRequest) message;
                 accountNumber = msg.accountNumber;

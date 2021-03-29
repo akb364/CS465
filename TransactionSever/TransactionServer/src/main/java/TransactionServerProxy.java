@@ -56,7 +56,6 @@ public class TransactionServerProxy
         }
         catch (IOException | ClassNotFoundException e)
         {
-            System.out.println("yo");
             return -1;
         }
         System.out.println("Transaction successfully opened.");
@@ -112,6 +111,7 @@ public class TransactionServerProxy
         }
         catch (Exception e)
         {
+            System.out.println(e.toString());
             System.out.println("Failed to read from account.");
             return -1;
         }
@@ -133,6 +133,7 @@ public class TransactionServerProxy
 
             // no response
             System.out.println("write successfull");
+            return;
         }
         catch (Exception e)
         {

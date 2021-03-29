@@ -13,7 +13,7 @@ public class AccountManager
 
     public AccountManager()
     {
-        try (InputStream input = new FileInputStream("TransactionSever.properties")) {
+        try (InputStream input = new FileInputStream("TransactionServer.properties")) {
 
             Properties prop = new Properties();
 

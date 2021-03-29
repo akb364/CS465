@@ -33,6 +33,8 @@ public class TransactionClient extends Thread
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+        proxy = new TransactionServerProxy(this.ip, this.port);
+
     }
 
     @Override
@@ -42,6 +44,7 @@ public class TransactionClient extends Thread
         int transID = serverProxy.openTransaction();
 
         // stuff
+        System.out.println("hi");
 
         serverProxy.closeTransaction(transID);
     }
@@ -49,10 +52,26 @@ public class TransactionClient extends Thread
     public static void main(String[] args)
     {
         TransactionClient self = new TransactionClient();
-        for(int i = 0; i < self.numTransactions; i++)
+       /* for(int i = 0; i < self.numTransactions; i++)
         {
           runTransactionTest(numAccounts);
-        }
+        }*/
+       runTransaction();
+    }
+    
+    
+    
+    public static void runTransaction()
+    {
+        Integer transactionID = proxy.openTransaction();
+        
+        System.out.println(proxy.read(0));
+        
+        proxy.write(0,100);
+        System.out.println("hi");
+        System.out.println(proxy.read(0));
+        
+        proxy.closeTransaction(transactionID);
     }
     
     public static void runTransactionTest(int accountCnt) 
