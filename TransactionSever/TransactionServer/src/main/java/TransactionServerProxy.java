@@ -29,6 +29,7 @@ public class TransactionServerProxy
 
     public int openTransaction()
     {
+        System.out.println("yo");
         // check if transaction is already opened
         if (transactionIsOpen)
         {
@@ -38,8 +39,7 @@ public class TransactionServerProxy
         try
         {
             connection = new Socket(ip, serverPort);
-
-            // open connection with server
+            
             writeToNet = new ObjectOutputStream(connection.getOutputStream());
             readFromNet = new ObjectInputStream(connection.getInputStream());
 
@@ -50,9 +50,13 @@ public class TransactionServerProxy
             MsgTransactionID message = (MsgTransactionID)readFromNet.readObject();
 
             transactionID = message.transactionID;
+            System.out.println(transactionID);
+            
+            writeToNet.flush();
         }
-        catch (Exception e)
+        catch (IOException | ClassNotFoundException e)
         {
+            System.out.println("yo");
             return -1;
         }
         System.out.println("Transaction successfully opened.");
@@ -72,13 +76,12 @@ public class TransactionServerProxy
         try
         {
             // send with transactionID
-            writeToNet = new ObjectOutputStream(connection.getOutputStream());
-            readFromNet = new ObjectInputStream(connection.getInputStream());
-
             writeToNet.writeObject(new MsgCloseTransaction(transactionID));
+            writeToNet.flush();
         }
         catch (Exception e)
         {
+            System.out.println(e.toString());
             System.out.println("Failed to close transaction.");
             return;
         }
@@ -97,12 +100,9 @@ public class TransactionServerProxy
         }
         try
         {
-            // assume connection exists
-            writeToNet = new ObjectOutputStream(connection.getOutputStream());
-            readFromNet = new ObjectInputStream(connection.getInputStream());
-
             // send message
             writeToNet.writeObject(new MsgReadRequest(accountNumber));
+            writeToNet.flush();
 
             // get response
             MsgAccountBalance message = (MsgAccountBalance)readFromNet.readObject();
@@ -126,12 +126,10 @@ public class TransactionServerProxy
         }
         try
         {
-            // assume connection exists
-            writeToNet = new ObjectOutputStream(connection.getOutputStream());
-            readFromNet = new ObjectInputStream(connection.getInputStream());
 
             // send message
             writeToNet.writeObject(new MsgWriteRequest(accountNumber, amount));
+            writeToNet.flush();
 
             // no response
             System.out.println("write successfull");
@@ -139,7 +137,6 @@ public class TransactionServerProxy
         catch (Exception e)
         {
             System.out.println("Failed to write to account.");
-            return;
         }
     }
 }

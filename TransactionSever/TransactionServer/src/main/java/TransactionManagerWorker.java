@@ -59,7 +59,7 @@ public class TransactionManagerWorker extends Thread
                 {
                     System.out.println("[TransactionWorker.run] OPEN_TRANSACTION - Error when writing transactionID");
                 }
-                transaction.log("[TransactionWorker.run] OPEN_TRANSACTION #" + transaction.transactionID);
+                System.out.println("[TransactionWorker.run] OPEN_TRANSACTION #" + transaction.transactionID);
             }
 
             if(message instanceof MsgCloseTransaction)
@@ -78,10 +78,7 @@ public class TransactionManagerWorker extends Thread
                     System.out.println("[TransactionWorker.run] CLOSE_TRANSACTION - Error when closing connectiont to client");
                 }
 
-                transaction.log("[TransactionWorker.run] CLOSE_TRANSACTION #" + transaction.transactionID);
-
-                //print all transactions logs
-                transaction.printLogs();
+                //transaction.log("[TransactionWorker.run] CLOSE_TRANSACTION #" + transaction.transactionID);
 
             }
 
@@ -89,7 +86,7 @@ public class TransactionManagerWorker extends Thread
             {
                 MsgReadRequest msg = (MsgReadRequest) message;
                 accountNumber = msg.accountNumber;
-                transaction.log("[TransactionWorker.run] READ_REQUEST >>>>>>>>>>>> account #: " + accountNumber);
+                //transaction.log("[TransactionWorker.run] READ_REQUEST >>>>>>>>>>>> account #: " + accountNumber);
                 balance = AccountManager.getInstance().read(accountNumber, transaction);
 
                 try
@@ -101,7 +98,7 @@ public class TransactionManagerWorker extends Thread
                     System.out.println("[TransactionWorker.run] READ_REQUEST - Error whent writing to object stream");
                 }
 
-                transaction.log("[TransactionWorker.run] READ_REQUEST <<<<<<<<<<<< account #: " + accountNumber + " balance: " + balance);
+                //transaction.log("[TransactionWorker.run] READ_REQUEST <<<<<<<<<<<< account #: " + accountNumber + " balance: " + balance);
             }
 
             if(message instanceof MsgReadRequest)
@@ -109,7 +106,7 @@ public class TransactionManagerWorker extends Thread
                 MsgWriteRequest msg = (MsgWriteRequest) message;
                 accountNumber = msg.accountNumber;
                 balance = msg.valToAdd;
-                transaction.log("[TransactionWorker.run] WRITE_REQUEST >>>>>>>>>>>> account #: " + accountNumber);
+                //transaction.log("[TransactionWorker.run] WRITE_REQUEST >>>>>>>>>>>> account #: " + accountNumber);
 
                 balance = AccountManager.getInstance().write(accountNumber,transaction,balance);
                 try
@@ -121,7 +118,7 @@ public class TransactionManagerWorker extends Thread
                     System.out.println("[TransactionWorker.run] WRITE_REQUEST - Error whent writing");
                 }
 
-                transaction.log("[TransactionWorker.run] WRITE_REQUEST <<<<<<<<<<<< account #: " + accountNumber);
+                //transaction.log("[TransactionWorker.run] WRITE_REQUEST <<<<<<<<<<<< account #: " + accountNumber);
             }
 
         }

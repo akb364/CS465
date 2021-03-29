@@ -1,6 +1,8 @@
 import java.io.*;
 import java.util.*;
 import java.net.*;
+import java.util.concurrent.ThreadLocalRandom;
+
 
 public class TransactionClient extends Thread
 {
@@ -8,6 +10,8 @@ public class TransactionClient extends Thread
     //private TransactionClient self;
     private int port;
     private String ip;
+    static TransactionServerProxy proxy;
+    private static int numAccounts;
 
     public TransactionClient()
     {
@@ -22,6 +26,7 @@ public class TransactionClient extends Thread
             this.numTransactions = Integer.parseInt(prop.getProperty("NUMBER_TRANSACTIONS"));
             this.ip = prop.getProperty("HOST");
             this.port = Integer.parseInt(prop.getProperty("PORT"));
+            this.numAccounts = Integer.parseInt(prop.getProperty("NUMBER_ACCOUNTS"));
 
             //this.self = new TransactionClient();
 
@@ -44,10 +49,36 @@ public class TransactionClient extends Thread
     public static void main(String[] args)
     {
         TransactionClient self = new TransactionClient();
-
         for(int i = 0; i < self.numTransactions; i++)
         {
-            self.start();
+          runTransactionTest(numAccounts);
         }
+    }
+    
+    public static void runTransactionTest(int accountCnt) 
+    {
+        Integer transactionID = proxy.openTransaction();
+        ThreadLocalRandom rand = ThreadLocalRandom.current();
+        int srcAcct = rand.nextInt(accountCnt);
+        int dstAcct = rand.nextInt(accountCnt);
+        
+        while (srcAcct == dstAcct) 
+        {
+            dstAcct = rand.nextInt(accountCnt);
+        }
+
+        int srcBal = proxy.read(srcAcct);
+
+        int dstBal = proxy.read(dstAcct);
+
+        int withdrawAmt = rand.nextInt(srcBal + 1);
+        
+        proxy.write(srcAcct, srcBal - withdrawAmt);
+       
+        // Deposit to dst
+        proxy.write(dstAcct, dstBal + withdrawAmt);
+
+        // Close transaction
+        proxy.closeTransaction(transactionID);
     }
 }

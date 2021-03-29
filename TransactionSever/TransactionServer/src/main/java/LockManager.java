@@ -1,31 +1,40 @@
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.*;
 
 public class LockManager {
 
-    private Hashtable theLocks;
+    private ArrayList<Lock> theLocks = new ArrayList<Lock>();
     private static LockManager INSTANCE;
 
-    public void setLock(Object object, Transaction trans, LockType lockType)
+    public void setLock(Account acc, Transaction trans, LockType lockType)
     {
-        Lock foundLock;
-        synchronized(this) {
-            // find the lock associated with object
-            // if there isnt one, create it and add to the hashtable
-        }
-        foundLock.aquire(trans, lockType);
-    }
-    // synchronize this one because we want to remove all entries
-
-    public synchronized void unLock(TransID trans)
-    {
-        Enumeration e = theLocks.elements();
-        while(e.hasMoreElements()) {
-            Lock aLock = (Lock) (e.nextElement());
-            if( /* trans is a holder of this lock*/) {
-                aLock.release(trans);
+        Lock foundLock = null;
+        
+        synchronized(this) 
+        {
+            for(int i = 0; i < theLocks.size(); i++)
+            {
+                if(theLocks.get(i).lockedAccount.equals(acc))
+                {
+                   foundLock = theLocks.get(i); 
+                }
+            }
+            if(foundLock == null)
+            {
+                foundLock = new Lock(acc);
+                theLocks.add(foundLock);
             }
         }
+        foundLock.acquire(trans, lockType);
+    }
+    public synchronized void unLock(Transaction trans)
+    {
+            for(int i = 0; i < theLocks.size(); i++)
+            {
+                if(theLocks.get(i).holders.contains(trans))
+                {
+                   theLocks.get(i).release(trans);
+                }
+            }
     }
 
     public static LockManager getInstance()
@@ -37,7 +46,4 @@ public class LockManager {
 
         return INSTANCE;
     }
-
-
-
 }

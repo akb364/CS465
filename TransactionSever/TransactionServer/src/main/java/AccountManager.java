@@ -1,12 +1,10 @@
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Properties;
 
-public class AccountManager implements LockType
+public class AccountManager
 {
     private static ArrayList<Account> accounts;
     static int numberAccounts;
@@ -56,7 +54,7 @@ public class AccountManager implements LockType
         Account account = getAccount(accountNum);
 
         // set read lock and wait until lock is free
-        LockManager.getInstance().lock(account, transaction, LockType.READ_LOCK);
+        LockManager.getInstance().setLock(account, transaction, LockType.READ_LOCK);
 
         // return when lock is released
         return (getAccount(accountNum)).getBalance();
@@ -68,7 +66,7 @@ public class AccountManager implements LockType
         Account account = getAccount(accountNum);
 
         // set write lock and wait until lock is free
-        LockManager.getInstance().lock(account, transaction, LockType.WRITE_LOCK);
+        LockManager.getInstance().setLock(account, transaction, LockType.WRITE_LOCK);
         
         // write amount
         account.setBalance(balance);

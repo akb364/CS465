@@ -1,39 +1,57 @@
-import java.util.Vector;
+import java.util.*;
 
-public class Lock {
-    
+
+public class Lock 
+{  
+    public Account lockedAccount;
     private Object object;
-    private Vector holders;
+    public List<Transaction> holders;
     private LockType lockType;
 
+    public Lock(Account acc) {
+        // Tie the account to the lock
+        this.lockedAccount = acc;
+        this.lockType = null;
+        this.holders = Collections.synchronizedList(new ArrayList<>());
+    }
+    
     public synchronized void acquire(Transaction trans, LockType lockType)
     {
-        // while(/* another transaction holds the lock in conflicting mode*/)
-        // {
-        //     try{
-        //         wait();
-        //     } catch(InterruptedException e) {
-
-        //     }
-        // }
-
-        // if( holders.isEmpty()) { // no TIDs hold lock
-        //     holders.addElement(trans);
-        //     lockType = aLockType;
-        // } else if( /*another transaction holds the lock, share it*/) {
-        //     if(/* this transaction not a holder*/) {
-        //         holders.addElement(trans);
-        //     }
-        // } else if(/* this transaction is a holder but needs a more exclusive lock*/) {
-        //     lockType.promote();
-        // }
+        while(!(holders.isEmpty() || 
+                this.holders.size() == 1 && holders.contains(trans) ||
+                lockType == LockType.READ_LOCK && this.lockType == LockType.READ_LOCK))
+        {
+            try 
+            {
+                wait();
+            } 
+            catch (InterruptedException e) 
+            {
+            }        
+        }
+        
+        holders.add(trans);
+        this.lockType = lockType;
+        if(holders.isEmpty() || lockType == LockType.READ_LOCK && this.lockType == LockType.READ_LOCK)
+        {
+            holders.add(trans);
+            this.lockType = lockType;
+        }
+        else if (this.holders.size() == 1 && holders.contains(trans))
+        {
+            this.lockType = LockType.WRITE_LOCK;
+        }
+        
     }
 
     public synchronized void release(Transaction trans) 
     {
-        // holders.removeElement(trans);       // remove this holder
-        // // set locktype to none
-        // notifyAll();
+        if (holders.contains(trans)) 
+        {
+            holders.remove(trans);
+            // Notify every transaction thread waiting on this lock.
+            notifyAll();
+        }
     }
 
 }

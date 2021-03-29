@@ -1,49 +1,31 @@
 import java.util.ArrayList;
 
-public class Transaction {
+public class Transaction 
+{
     
     public int transactionID;
-    private ArrayList<String> logs;
+    public ArrayList<Lock> locks;
     
     public Transaction(int transactionID)
     {
         this.transactionID = transactionID;
-        this.logs = new ArrayList<String>();
-    }
-
-    public void openTransaction(int transactionID)
-    {
-
+        this.locks = new ArrayList<>();
     }
 
     public int readAccount(int accountNum)
     {
-        return 0;
+        return AccountManager.getInstance().read(accountNum, this);
     }
 
     public void writeToAccount(int accountNum, int amount)
     {
-
-    }  
-
-    public int closeTransaction()
-    {
-        return 0;
-    } 
-      
-    public int transferRandAmount()
-    {
-        return 0;
-    } 
-    
-    public void log(String log)
-    {
-        logs.add(log);
+        AccountManager.getInstance().write(accountNum, this ,amount);
     }
     
-    public void printLogs()
+    public void addLock(Lock lock) 
     {
-        System.out.println(logs);
+        locks.add(lock);
     }
-
+    
+    
 }
