@@ -4,9 +4,8 @@ import java.util.*;
 public class Lock 
 {  
     public Account lockedAccount;
-    private Object object;
     public List<Transaction> holders;
-    private LockType lockType;
+    public LockType lockType;
 
     public Lock(Account acc) {
         // Tie the account to the lock
@@ -18,8 +17,8 @@ public class Lock
     public synchronized void acquire(Transaction trans, LockType lockType)
     {
         while(!(holders.isEmpty() || 
-                this.holders.size() == 1 && holders.contains(trans) ||
-                lockType == LockType.READ_LOCK && this.lockType == LockType.READ_LOCK))
+                (holders.size() == 1 && holders.contains(trans)) ||
+                (lockType == LockType.READ_LOCK && this.lockType == LockType.READ_LOCK)))
         {
             try 
             {
@@ -30,8 +29,8 @@ public class Lock
             }        
         }
         
-        holders.add(trans);
-        this.lockType = lockType;
+        //holders.add(trans);
+        //this.lockType = lockType;
         if(holders.isEmpty() || lockType == LockType.READ_LOCK && this.lockType == LockType.READ_LOCK)
         {
             holders.add(trans);

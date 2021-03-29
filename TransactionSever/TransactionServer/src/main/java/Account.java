@@ -19,4 +19,9 @@ public class Account
         balance = newBalance;
     }
 
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof Account && ((Account) other).accountNum == this.accountNum;
+    }
+    
 }

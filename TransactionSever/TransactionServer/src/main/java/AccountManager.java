@@ -37,12 +37,6 @@ public class AccountManager
             accounts.add(accountIndex, new Account(accountIndex, initialBalance));
         }
     }
-
-    public Account getAccount(int accountNumber)
-    {
-        return accounts.get(accountNumber);
-    }
-
     public ArrayList<Account> getAccounts()
     {
         return accounts;
@@ -51,13 +45,13 @@ public class AccountManager
     public int read(int accountNum, Transaction transaction)
     {
         // get account
-        Account account = getAccount(accountNum);
+        Account account = accounts.get(accountNum);
 
         // set read lock and wait until lock is free
         LockManager.getInstance().setLock(account, transaction, LockType.READ_LOCK);
 
         // return when lock is released
-        return (getAccount(accountNum)).getBalance();
+        return account.getBalance();
     }
 
     public int write(int accountNum, Transaction transaction, int balance)

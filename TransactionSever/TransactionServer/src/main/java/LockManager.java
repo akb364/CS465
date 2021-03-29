@@ -13,6 +13,7 @@ public class LockManager {
 
     public void setLock(Account acc, Transaction trans, LockType lockType)
     {
+        
         Lock foundLock = null;
         
         synchronized(this) 

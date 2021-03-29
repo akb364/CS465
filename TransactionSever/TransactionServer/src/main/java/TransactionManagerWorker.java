@@ -95,7 +95,7 @@ public class TransactionManagerWorker extends Thread
                 MsgReadRequest msg = (MsgReadRequest) message;
                 accountNumber = msg.accountNumber;
                 
-                System.out.println("[TransactionWorker.run] READ_REQUEST  >>>>>>>>>>>> account #: " + accountNumber + " balance: " + balance);
+                System.out.println("[TransactionWorker.run] READ_REQUEST  >>>>>>>>>>>> account #: " + accountNumber);
                 
                 balance = accManager.read(accountNumber, transaction);
                 try
