@@ -29,7 +29,6 @@ public class TransactionServerProxy
 
     public int openTransaction()
     {
-        System.out.println("yo");
         // check if transaction is already opened
         if (transactionIsOpen)
         {
@@ -50,7 +49,6 @@ public class TransactionServerProxy
             MsgTransactionID message = (MsgTransactionID)readFromNet.readObject();
 
             transactionID = message.transactionID;
-            System.out.println(transactionID);
             
             writeToNet.flush();
         }
@@ -77,6 +75,7 @@ public class TransactionServerProxy
             // send with transactionID
             writeToNet.writeObject(new MsgCloseTransaction(transactionID));
             writeToNet.flush();
+            connection.close();
         }
         catch (Exception e)
         {
@@ -86,7 +85,8 @@ public class TransactionServerProxy
         }
         System.out.println("Transaction successfully closed.");
 
-        transactionIsOpen = false;   
+        transactionIsOpen = false;
+
     }
 
     public int read(int accountNumber)
@@ -126,14 +126,12 @@ public class TransactionServerProxy
         }
         try
         {
-
             // send message
             writeToNet.writeObject(new MsgWriteRequest(accountNumber, amount));
             writeToNet.flush();
 
             // no response
             System.out.println("write successfull");
-            return;
         }
         catch (Exception e)
         {

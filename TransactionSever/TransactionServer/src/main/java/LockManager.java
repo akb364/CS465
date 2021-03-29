@@ -2,8 +2,14 @@ import java.util.*;
 
 public class LockManager {
 
-    private ArrayList<Lock> theLocks = new ArrayList<Lock>();
+    private ArrayList<Lock> lockList;
     private static LockManager INSTANCE;
+    
+    
+    public LockManager()
+    {
+        lockList = new ArrayList<Lock>();
+    }
 
     public void setLock(Account acc, Transaction trans, LockType lockType)
     {
@@ -11,30 +17,30 @@ public class LockManager {
         
         synchronized(this) 
         {
-            for(int i = 0; i < theLocks.size(); i++)
+            for(int i = 0; i < lockList.size(); i++)
             {
-                if(theLocks.get(i).lockedAccount.equals(acc))
+                if(lockList.get(i).lockedAccount.equals(acc))
                 {
-                   foundLock = theLocks.get(i); 
+                   foundLock = lockList.get(i); 
                 }
             }
             if(foundLock == null)
             {
                 foundLock = new Lock(acc);
-                theLocks.add(foundLock);
+                lockList.add(foundLock);
             }
         }
         foundLock.acquire(trans, lockType);
     }
     public synchronized void unLock(Transaction trans)
     {
-            for(int i = 0; i < theLocks.size(); i++)
+        for(int i = 0; i < lockList.size(); i++)
+        {
+             if(lockList.get(i).holders.contains(trans))
             {
-                if(theLocks.get(i).holders.contains(trans))
-                {
-                   theLocks.get(i).release(trans);
-                }
+                lockList.get(i).release(trans);
             }
+        }
     }
 
     public static LockManager getInstance()

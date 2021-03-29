@@ -15,6 +15,9 @@ public class TransactionManagerWorker extends Thread
     int balance = 0;
     Object message = null;
     boolean keepgoing = true;
+    AccountManager accManager;
+    TransactionManager transManager;
+    
 
     public TransactionManagerWorker(Socket client)
     {
@@ -26,10 +29,12 @@ public class TransactionManagerWorker extends Thread
         } 
         catch (IOException e) 
         {
-            System.out.println("[TransactionWorker.run] failed to open object stream");
-            e.printStackTrace();
+            System.out.println("[TransactionWorker.run] " + e.toString());
+            
             System.exit(1);
         }
+        accManager = AccountManager.getInstance();
+        transManager = TransactionManager.getInstance();
     }
 
     @Override
@@ -38,9 +43,12 @@ public class TransactionManagerWorker extends Thread
         while(keepgoing)
         {
             //reading msg
-            try{
+            try
+            {
                 message = readFromNet.readObject();
-            } catch(IOException | ClassNotFoundException e){
+            } 
+            catch(IOException | ClassNotFoundException e)
+            {
                 System.out.println("[TransactionWorker.run] Message could not be read from object stream.");
                 System.exit(1);
             }
@@ -49,7 +57,7 @@ public class TransactionManagerWorker extends Thread
             {
                 
                 transaction = new Transaction(TransactionManager.getInstance().transactionCounter++);
-                TransactionManager.getInstance().transactions.add(transaction); 
+                transManager.transactions.add(transaction); 
 
                 try 
                 {
@@ -62,10 +70,10 @@ public class TransactionManagerWorker extends Thread
                 System.out.println("[TransactionWorker.run] OPEN_TRANSACTION #" + transaction.transactionID);
             }
 
-            if(message instanceof MsgCloseTransaction)
+            else if(message instanceof MsgCloseTransaction)
             {
                 LockManager.getInstance().unLock(transaction);
-                 TransactionManager.getInstance().transactions.remove(transaction);
+                transManager.transactions.remove(transaction);
                 try
                 {
                     readFromNet.close();
@@ -78,17 +86,18 @@ public class TransactionManagerWorker extends Thread
                     System.out.println("[TransactionWorker.run] CLOSE_TRANSACTION - Error when closing connectiont to client");
                 }
 
-                //transaction.log("[TransactionWorker.run] CLOSE_TRANSACTION #" + transaction.transactionID);
+                System.out.println("[TransactionWorker.run] CLOSE_TRANSACTION #" + transaction.transactionID);
 
             }
 
-            if(message instanceof MsgReadRequest)
+            else if(message instanceof MsgReadRequest)
             {
                 MsgReadRequest msg = (MsgReadRequest) message;
                 accountNumber = msg.accountNumber;
-                //transaction.log("[TransactionWorker.run] READ_REQUEST >>>>>>>>>>>> account #: " + accountNumber);
-                balance = AccountManager.getInstance().read(accountNumber, transaction);
-
+                
+                System.out.println("[TransactionWorker.run] READ_REQUEST  >>>>>>>>>>>> account #: " + accountNumber + " balance: " + balance);
+                
+                balance = accManager.read(accountNumber, transaction);
                 try
                 {
                     writeToNet.writeObject(new MsgAccountBalance(balance));
@@ -98,27 +107,24 @@ public class TransactionManagerWorker extends Thread
                     System.out.println("[TransactionWorker.run] READ_REQUEST - Error whent writing to object stream");
                 }
 
-                //transaction.log("[TransactionWorker.run] READ_REQUEST <<<<<<<<<<<< account #: " + accountNumber + " balance: " + balance);
+                System.out.println("[TransactionWorker.run] READ_REQUEST  <<<<<<<<<<<< account #: " + accountNumber + " balance: " + balance);
             }
 
-            if(message instanceof MsgWriteRequest)
+            else if(message instanceof MsgWriteRequest)
             {
                 MsgWriteRequest msg = (MsgWriteRequest) message;
                 accountNumber = msg.accountNumber;
                 balance = msg.valToAdd;
-                //transaction.log("[TransactionWorker.run] WRITE_REQUEST >>>>>>>>>>>> account #: " + accountNumber);
+                
+                System.out.println("[TransactionWorker.run] WRITE_REQUEST >>>>>>>>>>>> account #: " + accountNumber);
 
-                balance = AccountManager.getInstance().write(accountNumber,transaction,balance);
-                try
-                {
-                    writeToNet.writeObject(balance);
-                } 
-                catch (IOException e)
-                {
-                    System.out.println("[TransactionWorker.run] WRITE_REQUEST - Error whent writing");
-                }
+                accManager.write(accountNumber,transaction,balance);
 
-                //transaction.log("[TransactionWorker.run] WRITE_REQUEST <<<<<<<<<<<< account #: " + accountNumber);
+                System.out.println("[TransactionWorker.run] WRITE_REQUEST <<<<<<<<<<<< account #: " + accountNumber);
+            }
+            else
+            {
+                System.out.println("?????????????????");
             }
 
         }

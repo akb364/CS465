@@ -65,6 +65,4 @@ public class TransactionServer extends Thread implements Serializable
     {
         new TransactionServer().start();
     }
-
-
 }

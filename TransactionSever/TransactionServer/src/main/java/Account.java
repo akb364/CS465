@@ -1,5 +1,5 @@
-public class Account {
-
+public class Account 
+{
     private int balance;
     private final int accountNum;
     
@@ -11,18 +11,12 @@ public class Account {
 
     public int getBalance()
     {
-        return this.balance;
+        return balance;
     }
 
-    public int setBalance(int newBalance)
+    public void setBalance(int newBalance)
     {
-        this.balance = newBalance;
-        return this.balance;
-    }
-
-    public void transferRandAmount()
-    {
-        
+        balance = newBalance;
     }
 
 }

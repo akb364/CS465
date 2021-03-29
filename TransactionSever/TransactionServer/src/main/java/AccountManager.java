@@ -63,13 +63,12 @@ public class AccountManager
     public int write(int accountNum, Transaction transaction, int balance)
     {
         // get account
-        Account account = getAccount(accountNum);
+        Account account = accounts.get(accountNum);
+        
+        account.setBalance(balance);
 
         // set write lock and wait until lock is free
         LockManager.getInstance().setLock(account, transaction, LockType.WRITE_LOCK);
-        
-        // write amount
-        account.setBalance(balance);
 
         return balance;
     }

@@ -10,7 +10,7 @@ public class TransactionClient extends Thread
     //private TransactionClient self;
     private int port;
     private String ip;
-    static TransactionServerProxy proxy;
+    //static TransactionServerProxy proxy;
     private static int numAccounts;
 
     public TransactionClient()
@@ -33,45 +33,81 @@ public class TransactionClient extends Thread
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        proxy = new TransactionServerProxy(this.ip, this.port);
+        //proxy = new TransactionServerProxy(this.ip, this.port);
 
     }
 
     @Override
     public void run()
     {
-        TransactionServerProxy serverProxy = new TransactionServerProxy(ip, port);
-        int transID = serverProxy.openTransaction();
+        TransactionServerProxy proxy = new TransactionServerProxy(ip, port);
+        int transID = proxy.openTransaction();
+        
+        Random rand = new Random();
+        int randomAcc1 = rand.nextInt(numAccounts);
+        int randomAcc2 = rand.nextInt(numAccounts);
+        while(randomAcc1 == randomAcc2)
+        {
+            randomAcc2 = rand.nextInt(numAccounts);
+        }
 
-        // stuff
-        System.out.println("hi");
+        int srcBal = proxy.read(randomAcc1);
 
-        serverProxy.closeTransaction(transID);
+        int dstBal = proxy.read(randomAcc2);
+
+        int withdrawAmt = rand.nextInt(srcBal + 1);
+        
+        proxy.write(randomAcc1, srcBal - withdrawAmt);
+       
+        proxy.write(randomAcc2, dstBal + withdrawAmt);
+
+        proxy.closeTransaction(transID);
+        
+        // NOW CHECK FOR RIGHT BALANCES
+        /*  
+        int acc1bal=srcBal - withdrawAmt;
+        System.out.println("acc#" + randomAcc1 + " should be:" + acc1bal);
+        
+        int acc1ba2=dstBal + withdrawAmt;
+        System.out.println("acc#" + randomAcc2 + " should be:" + acc1ba2);
+        
+
+        proxy = new TransactionServerProxy(ip, port);
+        transID = proxy.openTransaction();
+        
+        System.out.println("actual for acc#" + randomAcc1 + ": " + proxy.read(randomAcc1));
+                
+        System.out.println("actual for acc#" + randomAcc2 + ": " + proxy.read(randomAcc2));
+        
+        proxy.closeTransaction(transID);
+        */
+        
     }
 
     public static void main(String[] args)
     {
-        TransactionClient self = new TransactionClient();
-       /* for(int i = 0; i < self.numTransactions; i++)
-        {
-          runTransactionTest(numAccounts);
-        }*/
-       runTransaction();
+       TransactionClient self = new TransactionClient();
+       
+       for(int i = 0; i < self.numTransactions; i++)  // self.numTransactions
+       {
+           TransactionClient client = new TransactionClient();
+           client.start();
+       }
+       //self.runTransaction();
     }
-    
-    
-    
-    public static void runTransaction()
+       
+   /* public void runTransaction()
     {
         Integer transactionID = proxy.openTransaction();
         
         System.out.println(proxy.read(0));
         
         proxy.write(0,100);
-        System.out.println("hi");
+        
         System.out.println(proxy.read(0));
         
         proxy.closeTransaction(transactionID);
+                        
     }
     
     public static void runTransactionTest(int accountCnt) 
@@ -99,5 +135,5 @@ public class TransactionClient extends Thread
 
         // Close transaction
         proxy.closeTransaction(transactionID);
-    }
+    }*/
 }
