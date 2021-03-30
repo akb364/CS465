@@ -15,7 +15,7 @@ public class LockManager {
     {
         
         Lock foundLock = null;
-        System.out.println("Transaction" + trans + "Is looking for a lock for account" + acc);
+        System.out.println("Transaction " + trans.transactionID + " is looking for a lock for account " + acc.accountNum);
 
         synchronized(this) 
         {
@@ -24,7 +24,7 @@ public class LockManager {
                 if(lockList.get(i).lockedAccount.equals(acc))
                 {
                    foundLock = lockList.get(i); 
-                   System.out.println("Transaction" + trans + "found a lock for account" + acc);
+                   System.out.println("Transaction " + trans.transactionID + " found a lock for account " + acc.accountNum);
 
                 }
             }
@@ -32,7 +32,7 @@ public class LockManager {
             {
                 foundLock = new Lock(acc);
                 lockList.add(foundLock);
-                System.out.println("Transaction" + trans + "did not find a lock for account" + acc + "creating a lock of lock type" + lockType);
+                System.out.println("Transaction " + trans.transactionID + " did not find a lock for account " + acc.accountNum + " creating a lock of lock type " + lockType);
 
             }
         }
@@ -40,13 +40,13 @@ public class LockManager {
     }
     public synchronized void unLock(Transaction trans)
     {
-        System.out.println("Transaction" + transactionID + "unlocking held locks");
+        System.out.println("Transaction " + trans.transactionID + " unlocking held locks");
 
         for(int i = 0; i < lockList.size(); i++)
         {
              if(lockList.get(i).holders.contains(trans))
             {
-                System.out.println("Transaction" + trans + "unlocked lock on account" + acc);
+                System.out.println("Transaction " + trans.transactionID + " unlocked lock on account " + lockList.get(i).lockedAccount.accountNum);
                 lockList.get(i).release(trans);
             }
         }

@@ -46,7 +46,7 @@ public class AccountManager
     {
         // get account
         Account account = accounts.get(accountNum);
-        System.out.println("Transaction" + transactionID + ": Account Manager reading account" + accountNum);
+        System.out.println("Transaction " + transaction.transactionID + ": Account Manager reading account " + accountNum);
 
         // set read lock and wait until lock is free
         LockManager.getInstance().setLock(account, transaction, LockType.READ_LOCK);
@@ -59,7 +59,7 @@ public class AccountManager
     {
         // get account
         Account account = accounts.get(accountNum);
-        System.out.println("Transaction" + transactionID +": Account Manager writing to account" + accountNum);
+        System.out.println("Transaction " + transaction.transactionID +": Account Manager writing to account " + accountNum);
         account.setBalance(balance);
 
         // set write lock and wait until lock is free

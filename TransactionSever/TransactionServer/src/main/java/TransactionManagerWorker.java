@@ -67,7 +67,7 @@ public class TransactionManagerWorker extends Thread
                 {
                     System.out.println("[TransactionWorker.run] OPEN_TRANSACTION - Error when writing transactionID");
                 }
-                System.out.println("[TransactionWorker.run] OPEN_TRANSACTION #" + transaction.transactionID);
+                System.out.println("[TransactionWorker.run] OPEN_TRANSACTION # " + transaction.transactionID);
             }
 
             else if(message instanceof MsgCloseTransaction)
@@ -86,7 +86,7 @@ public class TransactionManagerWorker extends Thread
                     System.out.println("[TransactionWorker.run] CLOSE_TRANSACTION - Error when closing connectiont to client");
                 }
 
-                System.out.println("[TransactionWorker.run] CLOSE_TRANSACTION #" + transaction.transactionID);
+                System.out.println("[TransactionWorker.run] CLOSE_TRANSACTION # " + transaction.transactionID);
 
             }
 

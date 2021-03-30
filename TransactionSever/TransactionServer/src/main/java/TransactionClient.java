@@ -63,23 +63,6 @@ public class TransactionClient extends Thread
 
         proxy.closeTransaction(transID);
         
-        // NOW CHECK FOR RIGHT BALANCES
-        int acc1bal=srcBal - withdrawAmt;
-        System.out.println("acc#" + randomAcc1 + " should be:" + acc1bal);
-        
-        int acc1ba2=dstBal + withdrawAmt;
-        System.out.println("acc#" + randomAcc2 + " should be:" + acc1ba2);
-        
-
-        proxy = new TransactionServerProxy(ip, port);
-        transID = proxy.openTransaction();
-        
-        System.out.println("actual for acc#" + randomAcc1 + ": " + proxy.read(randomAcc1));
-                
-        System.out.println("actual for acc#" + randomAcc2 + ": " + proxy.read(randomAcc2));
-        
-        proxy.closeTransaction(transID);
-
         
     }
 

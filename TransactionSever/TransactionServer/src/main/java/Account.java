@@ -1,7 +1,7 @@
 public class Account 
 {
     private int balance;
-    private final int accountNum;
+    public final int accountNum;
     
     public Account(int num, int initialBalance)
     {
