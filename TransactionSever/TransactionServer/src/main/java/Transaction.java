@@ -14,11 +14,13 @@ public class Transaction
 
     public int readAccount(int accountNum)
     {
+        System.out.println("Transaction" + transactionID + "reading account" + accountNum);
         return AccountManager.getInstance().read(accountNum, this);
     }
 
     public void writeToAccount(int accountNum, int amount)
     {
+        System.out.println("Transaction" + transactionID + "writing account" + accountNum);
         AccountManager.getInstance().write(accountNum, this ,amount);
     }
     

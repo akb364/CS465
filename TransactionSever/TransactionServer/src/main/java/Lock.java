@@ -22,6 +22,7 @@ public class Lock
         {
             try 
             {
+                System.out.println("Transaction" + trans + "waiting for lockType of" + lockType + "for account" + acc);
                 wait();
             } 
             catch (InterruptedException e) 
@@ -33,11 +34,13 @@ public class Lock
         //this.lockType = lockType;
         if(holders.isEmpty() || lockType == LockType.READ_LOCK && this.lockType == LockType.READ_LOCK)
         {
+            System.out.println("Transaction" + transactionID + "No holder for this account" + acc + "setting lock to locktype of" + lockType);
             holders.add(trans);
             this.lockType = lockType;
         }
         else if (this.holders.size() == 1 && holders.contains(trans))
         {
+            System.out.println("Transaction" + transactionID + "Promoting lock on account" + acc);
             this.lockType = LockType.WRITE_LOCK;
         }
         
