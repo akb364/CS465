@@ -85,4 +85,13 @@ public class AccountManager
 
         return INSTANCE;
     }
+    public int branchTotal() {
+        int total = 0;
+
+        for (Account currAccount : accounts) 
+        {
+            total += currAccount.getBalance();
+        }
+        return total;
+    }
 }

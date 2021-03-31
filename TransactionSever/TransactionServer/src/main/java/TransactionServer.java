@@ -34,6 +34,7 @@ public class TransactionServer extends Thread implements Serializable
 
             System.out.println("Server listening with ip=" + 
                                strIP + " and port=" + prop.getProperty("PORT"));
+            System.out.println("Type anything to stop the server loop.");
 
         } 
         catch (IOException ex) 
@@ -45,18 +46,26 @@ public class TransactionServer extends Thread implements Serializable
     @Override
     public void run()
     {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        boolean run = true;
         // server loop
-        while(true)
+        while(run)
         {
             try
             {
                 TransactionManager.getInstance().runTransaction(serverSock.accept());
+                
+                if (br.readLine() != null)
+                {
+                    run = false;
+                }
             }
             catch (IOException ex)
             {
                 System.out.println(ex.toString());
             }
         }
+        System.out.println("Branch total is: " + AccountManager.getInstance().branchTotal());
     }
 
     public static void main(String[] args)
