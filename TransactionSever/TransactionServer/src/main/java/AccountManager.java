@@ -8,7 +8,8 @@ public class AccountManager
 {
     private static ArrayList<Account> accounts;
     static int numberAccounts;
-    static int initialBalance; 
+    static int initialBalance;
+    public boolean applyLocking;
     private static AccountManager INSTANCE;
 
     public AccountManager()
@@ -22,6 +23,7 @@ public class AccountManager
             
             this.numberAccounts = Integer.parseInt(prop.getProperty("NUMBER_ACCOUNTS"));
             this.initialBalance = Integer.parseInt(prop.getProperty("INITIAL_BALANCE"));
+            this.applyLocking = Boolean.parseBoolean(prop.getProperty("APPLY_LOCKING"));
 
         } 
         catch (IOException ex) 
@@ -49,7 +51,10 @@ public class AccountManager
         System.out.println("Transaction " + transaction.transactionID + ": Account Manager reading account " + accountNum);
 
         // set read lock and wait until lock is free
-        LockManager.getInstance().setLock(account, transaction, LockType.READ_LOCK);
+        if(applyLocking)
+        {
+            LockManager.getInstance().setLock(account, transaction, LockType.READ_LOCK);
+        }
 
         // return when lock is released
         return account.getBalance();
@@ -63,7 +68,10 @@ public class AccountManager
         account.setBalance(balance);
 
         // set write lock and wait until lock is free
-        LockManager.getInstance().setLock(account, transaction, LockType.WRITE_LOCK);
+        if(applyLocking)
+        {
+            LockManager.getInstance().setLock(account, transaction, LockType.WRITE_LOCK);
+        }
 
         return balance;
     }

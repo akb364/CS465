@@ -40,8 +40,6 @@ public class TransactionServer extends Thread implements Serializable
         {
             ex.printStackTrace();
         }
-
-        // NEED TO INITIALIZE ACCOUNTS HERE
     }
 
     @Override

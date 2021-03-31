@@ -17,7 +17,6 @@ public class TransactionManagerWorker extends Thread
     boolean keepgoing = true;
     AccountManager accManager;
     TransactionManager transManager;
-    
 
     public TransactionManagerWorker(Socket client)
     {
@@ -72,8 +71,12 @@ public class TransactionManagerWorker extends Thread
 
             else if(message instanceof MsgCloseTransaction)
             {
-                LockManager.getInstance().unLock(transaction);
+                if(accManager.applyLocking)
+                {
+                    LockManager.getInstance().unLock(transaction);
+                }
                 transManager.transactions.remove(transaction);
+
                 try
                 {
                     readFromNet.close();
