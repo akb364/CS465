@@ -115,6 +115,29 @@ public class Satellite extends Thread {
         // ...
 
 
+         try (InputStream input = new FileInputStream("../../../../../config/Server.properties"))
+        {
+
+            Properties prop = new Properties();
+
+            // load a properties file
+            prop.load(input);
+
+            // get the property values
+            String strIP = prop.getProperty("HOST");
+            this.host = InetAddress.getByName(strIP);
+            this.port = Integer.parseInt(prop.getProperty("PORT"));
+
+
+
+            System.out.println("Server listening with ip=" +
+                               strIP + " and port=" + prop.getProperty("PORT"));
+
+        }
+        catch (IOException ex)
+        {
+            ex.printStackTrace();
+        }
 
     }
 
@@ -142,7 +165,18 @@ public class Satellite extends Thread {
         // start taking job requests in a server loop
         // ---------------------------------------------------------------
         // ...
+        while(true)
+        {
+            try
+            {
+                new SatelliteThread(serverSock.accept(), this).start();
 
+            }
+            catch(Exception e)
+            {
+                System.out.println(e.toString());
+            }
+        }
     }
 
     // inner helper class that is instanciated in above server loop and processes single job requests
@@ -179,7 +213,7 @@ public class Satellite extends Thread {
         }
     }
 
-   /**
+    /**
      * Aux method to get a tool object, given the fully qualified class string
      * If the tool has been used before, it is returned immediately out of the cache,
      * otherwise it is loaded dynamically
