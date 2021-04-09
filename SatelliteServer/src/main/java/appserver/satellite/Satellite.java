@@ -39,29 +39,14 @@ public class Satellite extends Thread {
     private Hashtable toolsCache = null;
     private int port;
     private InetAddress host;
-        
+
     public Satellite(String satellitePropertiesFile, String classLoaderPropertiesFile, String serverPropertiesFile) {
 
         // read this satellite's properties and populate satelliteInfo object,
         // which later on will be sent to the server
         // ...
-        
-        
-        // read properties of the application server and populate serverInfo object
-        // other than satellites, the as doesn't have a human-readable name, so leave it out
-        // ...
-        
-        
-        // read properties of the code server and create class loader
-        // -------------------
-        // ...
 
-        
-        // create tools cache
-        // -------------------
-        // ...
-        
-         try (InputStream input = new FileInputStream("../../../../../config/Server.properties")) 
+        try (InputStream input = new FileInputStream(satellitePropertiesFile))
         {
 
             Properties prop = new Properties();
@@ -70,21 +55,67 @@ public class Satellite extends Thread {
             prop.load(input);
 
             // get the property values
-            String strIP = prop.getProperty("HOST");
-            this.host = InetAddress.getByName(strIP);
-            this.port = Integer.parseInt(prop.getProperty("PORT"));
+            satelliteInfo.setPort(Integer.parseInt(prop.getProperty("PORT")));
+            satelliteInfo.setName(prop.getProperty("NAME"));
 
-           
-
-            System.out.println("Server listening with ip=" + 
-                               strIP + " and port=" + prop.getProperty("PORT"));
-
-        } 
-        catch (IOException ex) 
+        }
+        catch (IOException ex)
         {
             ex.printStackTrace();
         }
-        
+
+        // read properties of the application server and populate serverInfo object
+        // other than satellites, the as doesn't have a human-readable name, so leave it out
+        // ...
+
+        try (InputStream input = new FileInputStream(serverPropertiesFile))
+        {
+
+            Properties prop = new Properties();
+
+            // load a properties file
+            prop.load(input);
+
+            // get the property values
+            serverInfo.setHost(prop.getProperty("HOST"));
+            serverInfo.setPort(Integer.parseInt(prop.getProperty("PORT")));
+
+
+        }
+        catch (IOException ex)
+        {
+            ex.printStackTrace();
+        }
+
+        // read properties of the code server and create class loader
+        // -------------------
+        // ...
+
+        try (InputStream input = new FileInputStream(classLoaderPropertiesFile))
+        {
+
+            Properties prop = new Properties();
+
+            // load a properties file
+            prop.load(input);
+
+            // get the property values
+            classLoader = new HTTPClassLoader(prop.getProperty("HOST"), Integer.parseInt(prop.getProperty("PORT")));
+            classLoader.classRootDir = prop.getProperty("DOC_ROOT");
+
+
+        }
+        catch (IOException ex)
+        {
+            ex.printStackTrace();
+        }
+
+        // create tools cache
+        // -------------------
+        // ...
+
+
+
     }
 
     @Override
@@ -93,8 +124,8 @@ public class Satellite extends Thread {
         // register this satellite with the SatelliteManager on the server
         // ---------------------------------------------------------------
         // ...IGNORE
-        
-        
+
+
         // create server socket
         // ---------------------------------------------------------------
         // ...
@@ -106,11 +137,12 @@ public class Satellite extends Thread {
         {
              System.out.println(e.toString());
         }
-        
-        
+
+
         // start taking job requests in a server loop
         // ---------------------------------------------------------------
         // ...
+
     }
 
     // inner helper class that is instanciated in above server loop and processes single job requests
@@ -131,10 +163,10 @@ public class Satellite extends Thread {
         public void run() {
             // setting up object streams
             // ...
-            
+
             // reading message
             // ...
-            
+
             switch (message.getType()) {
                 case JOB_REQUEST:
                     // processing job request
@@ -147,7 +179,7 @@ public class Satellite extends Thread {
         }
     }
 
-    /**
+   /**
      * Aux method to get a tool object, given the fully qualified class string
      * If the tool has been used before, it is returned immediately out of the cache,
      * otherwise it is loaded dynamically
@@ -157,7 +189,7 @@ public class Satellite extends Thread {
         Tool toolObject = null;
 
         // ...
-        
+
         return toolObject;
     }
 
