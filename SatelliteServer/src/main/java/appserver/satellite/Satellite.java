@@ -37,18 +37,14 @@ public class Satellite extends Thread {
     private ConnectivityInfo serverInfo = new ConnectivityInfo();
     private HTTPClassLoader classLoader = null;
     private Hashtable toolsCache = null;
-    private int port;
-    private InetAddress host;
 
     public Satellite(String satellitePropertiesFile, String classLoaderPropertiesFile, String serverPropertiesFile) {
 
         // read this satellite's properties and populate satelliteInfo object,
         // which later on will be sent to the server
         // ...
-
         try (InputStream input = new FileInputStream(satellitePropertiesFile))
         {
-
             Properties prop = new Properties();
 
             // load a properties file
@@ -57,7 +53,6 @@ public class Satellite extends Thread {
             // get the property values
             satelliteInfo.setPort(Integer.parseInt(prop.getProperty("PORT")));
             satelliteInfo.setName(prop.getProperty("NAME"));
-
         }
         catch (IOException ex)
         {
@@ -67,10 +62,8 @@ public class Satellite extends Thread {
         // read properties of the application server and populate serverInfo object
         // other than satellites, the as doesn't have a human-readable name, so leave it out
         // ...
-
         try (InputStream input = new FileInputStream(serverPropertiesFile))
         {
-
             Properties prop = new Properties();
 
             // load a properties file
@@ -79,8 +72,6 @@ public class Satellite extends Thread {
             // get the property values
             serverInfo.setHost(prop.getProperty("HOST"));
             serverInfo.setPort(Integer.parseInt(prop.getProperty("PORT")));
-
-
         }
         catch (IOException ex)
         {
@@ -90,7 +81,6 @@ public class Satellite extends Thread {
         // read properties of the code server and create class loader
         // -------------------
         // ...
-
         try (InputStream input = new FileInputStream(classLoaderPropertiesFile))
         {
 
@@ -114,31 +104,6 @@ public class Satellite extends Thread {
         // -------------------
         // ...
         toolsCache = new Hashtable();
-
-         try (InputStream input = new FileInputStream("../../../../../config/Server.properties"))
-        {
-
-            Properties prop = new Properties();
-
-            // load a properties file
-            prop.load(input);
-
-            // get the property values
-            String strIP = prop.getProperty("HOST");
-            this.host = InetAddress.getByName(strIP);
-            this.port = Integer.parseInt(prop.getProperty("PORT"));
-
-
-
-            System.out.println("Server listening with ip=" +
-                               strIP + " and port=" + prop.getProperty("PORT"));
-
-        }
-        catch (IOException ex)
-        {
-            ex.printStackTrace();
-        }
-
     }
 
     @Override
@@ -154,13 +119,12 @@ public class Satellite extends Thread {
         // ...
         try
         {
-            this.serverSock = new ServerSocket(port, 50, host);
+            this.serverSock = new ServerSocket(satelliteInfo.getPort(), 50, InetAddress.getByName(satelliteInfo.getHost()));
         }
         catch(Exception e)
         {
              System.out.println(e.toString());
         }
-
 
         // start taking job requests in a server loop
         // ---------------------------------------------------------------
@@ -170,7 +134,6 @@ public class Satellite extends Thread {
             try
             {
                 new SatelliteThread(serverSock.accept(), this).start();
-
             }
             catch(Exception e)
             {
@@ -197,18 +160,54 @@ public class Satellite extends Thread {
         public void run() {
             // setting up object streams
             // ...
+            try
+            {
+                readFromNet = new ObjectInputStream(jobRequest.getInputStream());
+                writeToNet = new ObjectOutputStream(jobRequest.getOutputStream());
+            }
+            catch(Exception e)
+            {
+                System.out.println(e.toString());
+            }
 
             // reading message
             // ...
+            try
+            {
+                message = (Message)readFromNet.readObject();
+            }
+            catch(Exception e)
+            {
+                System.out.println(e.toString());
+            }
 
             switch (message.getType()) {
                 case JOB_REQUEST:
                     // processing job request
                     // ...
+                    Job job = (Job)message.getContent();
+                    try
+                    {
+                        Tool tool = getToolObject(job.getToolName());
+                        writeToNet.writeObject(tool.go(job.getParameters()));
+                    }
+                    catch(Exception e)
+                    {
+                        System.out.println(e.toString());
+                    }
                     break;
 
                 default:
                     System.err.println("[SatelliteThread.run] Warning: Message type not implemented");
+            }
+            try
+            {
+                writeToNet.close();
+                readFromNet.close();
+            }
+            catch(Exception e)
+            {
+                System.out.println(e.toString());
             }
         }
     }
@@ -222,19 +221,19 @@ public class Satellite extends Thread {
 
         Tool toolObject = null;
 
-          if ((toolObject = toolsCache.get(toolClassString)) == null) 
+          if ((toolObject = (Tool)toolsCache.get(toolClassString)) == null) 
         {
-            String toolString = configuration.getProperty(toolClassString);
+            //String toolString = configuration.getProperty(toolClassString);
             System.out.println("\nTool's Class: " + toolClassString);
             if (toolClassString == null) 
             {
-                throw new UnknownOperationException();
+                throw new UnknownToolException();
             }
 
             Class<?> toolClass = classLoader.loadClass(toolClassString);
             try {
                 toolObject = (Tool) toolClass.getDeclaredConstructor().newInstance();
-            } catch (InvocationTargetException ex) {
+            } catch (Exception ex) {
 
                 System.err.println("[SatteliteServer] getToolObject() - InvocationTargetException");
             }
