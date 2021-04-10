@@ -113,7 +113,7 @@ public class Satellite extends Thread {
         // create tools cache
         // -------------------
         // ...
-
+        toolsCache = new Hashtable();
 
          try (InputStream input = new FileInputStream("../../../../../config/Server.properties"))
         {
@@ -222,7 +222,28 @@ public class Satellite extends Thread {
 
         Tool toolObject = null;
 
-        // ...
+          if ((toolObject = toolsCache.get(toolClassString)) == null) 
+        {
+            String toolString = configuration.getProperty(toolClassString);
+            System.out.println("\nTool's Class: " + toolClassString);
+            if (toolClassString == null) 
+            {
+                throw new UnknownOperationException();
+            }
+
+            Class<?> toolClass = classLoader.loadClass(toolClassString);
+            try {
+                toolObject = (Tool) toolClass.getDeclaredConstructor().newInstance();
+            } catch (InvocationTargetException ex) {
+
+                System.err.println("[SatteliteServer] getToolObject() - InvocationTargetException");
+            }
+            toolsCache.put(toolClassString, toolObject);
+        } 
+        else 
+        {
+            System.out.println("Tool Object: \"" + toolClassString + "\" already in Cache");
+        }
 
         return toolObject;
     }
