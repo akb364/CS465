@@ -42,7 +42,6 @@ public class Satellite extends Thread {
 
         // read this satellite's properties and populate satelliteInfo object,
         // which later on will be sent to the server
-        // ...
         try (InputStream input = new FileInputStream(satellitePropertiesFile))
         {
             Properties prop = new Properties();
@@ -61,7 +60,6 @@ public class Satellite extends Thread {
 
         // read properties of the application server and populate serverInfo object
         // other than satellites, the as doesn't have a human-readable name, so leave it out
-        // ...
         try (InputStream input = new FileInputStream(serverPropertiesFile))
         {
             Properties prop = new Properties();
@@ -80,7 +78,6 @@ public class Satellite extends Thread {
 
         // read properties of the code server and create class loader
         // -------------------
-        // ...
         try (InputStream input = new FileInputStream(classLoaderPropertiesFile))
         {
 
@@ -102,21 +99,27 @@ public class Satellite extends Thread {
 
         // create tools cache
         // -------------------
-        // ...
         toolsCache = new Hashtable();
     }
 
     @Override
     public void run() {
 
+        // NEEDS WORK STILL
         // register this satellite with the SatelliteManager on the server
         // ---------------------------------------------------------------
-        // ...IGNORE
-
-
+         try
+        {
+            Socket socket = new Socket(InetAddress.getByName(serverInfo.getHost()), serverInfo.getPort());
+        }
+        catch(Exception e)
+        {
+             System.out.println(e.toString());
+        }
+        
+        
         // create server socket
         // ---------------------------------------------------------------
-        // ...
         try
         {
             this.serverSock = new ServerSocket(satelliteInfo.getPort(), 50, InetAddress.getByName(satelliteInfo.getHost()));
@@ -128,7 +131,6 @@ public class Satellite extends Thread {
 
         // start taking job requests in a server loop
         // ---------------------------------------------------------------
-        // ...
         while(true)
         {
             try
@@ -159,7 +161,6 @@ public class Satellite extends Thread {
         @Override
         public void run() {
             // setting up object streams
-            // ...
             try
             {
                 readFromNet = new ObjectInputStream(jobRequest.getInputStream());
@@ -171,7 +172,6 @@ public class Satellite extends Thread {
             }
 
             // reading message
-            // ...
             try
             {
                 message = (Message)readFromNet.readObject();
@@ -184,7 +184,6 @@ public class Satellite extends Thread {
             switch (message.getType()) {
                 case JOB_REQUEST:
                     // processing job request
-                    // ...
                     Job job = (Job)message.getContent();
                     try
                     {
