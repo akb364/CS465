@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Properties;
@@ -32,12 +33,14 @@ public class Server {
 
         // create satellite manager and load manager
         satelliteManager = new SatelliteManager();
+        System.out.println("[Server.Server]Satellite Manager created.");
         loadManager = new LoadManager();
+        System.out.println("[Server.Server]Load Manager created.");
         
         // read server properties and create server socket
         try (InputStream input = new FileInputStream(serverPropertiesFile))
         {
-
+            
             Properties prop = new Properties();
 
             // load a properties file
@@ -46,7 +49,8 @@ public class Server {
             // get the property values
             this.ip = prop.getProperty("HOST");
             this.port = Integer.parseInt(prop.getProperty("PORT"));
-
+            this.serverSocket = new ServerSocket(this.port, 50, InetAddress.getByName(this.ip));
+            System.out.println("[Server.Server]Server Socket created.");
 
         }
         catch (IOException ex)
@@ -80,6 +84,7 @@ public class Server {
         Message message = null;
 
         private ServerThread(Socket client) {
+           
             this.client = client;
         }
 
@@ -109,8 +114,6 @@ public class Server {
             // process message
             switch (message.getType()) {
                 case REGISTER_SATELLITE:
-                    // read satellite info
-                    // ...
                     
                     // register satellite
                     synchronized (Server.satelliteManager) {
@@ -121,8 +124,12 @@ public class Server {
                     synchronized (Server.loadManager) {
                         ConnectivityInfo obj = (ConnectivityInfo)message.getContent();
                         Server.loadManager.satelliteAdded(obj.getName());
+                        System.out.println("[Server.Server]REGISTER_SATELLITE");
+                        System.out.println("Satellite IP: " + obj.getHost());
+                        System.out.println("Satellite port: " + obj.getPort());
+                        System.out.println("Satellite name: " + obj.getName());
                     }
-
+                    
                     break;
 
                 case JOB_REQUEST:
@@ -146,13 +153,13 @@ public class Server {
 
                     Socket satellite = null;
                     // connect to satellite
-                    // ...
+                    
 
                     // open object streams,
                     // forward message (as is) to satellite,
                     // receive result from satellite and
                     // write result back to client
-                    // ...
+                    
 
                     break;
 

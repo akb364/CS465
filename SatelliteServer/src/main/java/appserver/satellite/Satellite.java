@@ -52,6 +52,7 @@ public class Satellite extends Thread {
             // get the property values
             satelliteInfo.setPort(Integer.parseInt(prop.getProperty("PORT")));
             satelliteInfo.setName(prop.getProperty("NAME"));
+            satelliteInfo.setHost(prop.getProperty("HOST"));
         }
         catch (IOException ex)
         {
@@ -89,7 +90,9 @@ public class Satellite extends Thread {
             // get the property values
             classLoader = new HTTPClassLoader(prop.getProperty("HOST"), Integer.parseInt(prop.getProperty("PORT")));
             classLoader.classRootDir = prop.getProperty("DOC_ROOT");
-
+            System.out.println("[Satellite.Satellite] HTTPClassLoader created on " + satelliteInfo.getName());
+            
+            this.serverSock = new ServerSocket(satelliteInfo.getPort(), 50, InetAddress.getByName(satelliteInfo.getHost()));
 
         }
         catch (IOException ex)
@@ -100,17 +103,25 @@ public class Satellite extends Thread {
         // create tools cache
         // -------------------
         toolsCache = new Hashtable();
+        
+        
+       
+        
     }
 
     @Override
     public void run() {
-
-        // NEEDS WORK STILL
+        
+         ObjectOutputStream writeToNet = null;
+        
         // register this satellite with the SatelliteManager on the server
         // ---------------------------------------------------------------
          try
         {
             Socket socket = new Socket(InetAddress.getByName(serverInfo.getHost()), serverInfo.getPort());
+            writeToNet = new ObjectOutputStream(socket.getOutputStream());
+            
+            writeToNet.writeObject(new Message(REGISTER_SATELLITE, satelliteInfo));
         }
         catch(Exception e)
         {
@@ -123,6 +134,8 @@ public class Satellite extends Thread {
         try
         {
             this.serverSock = new ServerSocket(satelliteInfo.getPort(), 50, InetAddress.getByName(satelliteInfo.getHost()));
+            System.out.println("[Satellite.run] Satellite" + satelliteInfo.getName() + " connected to server, transfer connectivity information...");
+            
         }
         catch(Exception e)
         {
