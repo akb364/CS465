@@ -4,20 +4,20 @@
  * and open the template in the editor.
  */
 package appserver.job.impl;
-
+import appserver.job.Tool;
 /**
  *
  * @author Kevyn
  */
-public class Fibonacci {
+public class Fibonacci implements Tool {
     
-    public static int fib(int num)
+    FibonacciAux helper = null;
+    
+    @Override
+    public Object go(Object parameters)
     {
-        if (num <= 1)
-        {
-            return num;
-        }
+        helper = new FibonacciAux();
+        return helper.getResult((Integer) parameters);
         
-        return fib(num-1) + fib(num-2);
     }
 }

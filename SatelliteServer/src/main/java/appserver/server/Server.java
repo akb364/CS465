@@ -136,7 +136,10 @@ public class Server {
                     System.err.println("\n[ServerThread.run] Received job request");
 
                     String satelliteName = null;
-                    synchronized (Server.loadManager) {
+                    Socket satelliteSock = null;
+                    ConnectivityInfo satellite;
+                    synchronized (Server.loadManager) 
+                    {
                         // get next satellite from load manager
                         try
                         {
@@ -148,10 +151,10 @@ public class Server {
                         }
                         
                         // get connectivity info for next satellite from satellite manager
-                        Server.satelliteManager.getSatelliteForName(satelliteName);
+                        satellite = Server.satelliteManager.getSatelliteForName(satelliteName);
                     }
 
-                    Socket satellite = null;
+                    
                     // connect to satellite
                     
 
@@ -159,7 +162,27 @@ public class Server {
                     // forward message (as is) to satellite,
                     // receive result from satellite and
                     // write result back to client
-                    
+                    try
+                    {
+                        satelliteSock = new Socket(InetAddress.getByName(satellite.getHost()),satellite.getPort());
+                        ObjectOutputStream writeToSat = new ObjectOutputStream(satelliteSock.getOutputStream());
+                        ObjectInputStream readFromSat = new ObjectInputStream(satelliteSock.getInputStream());
+                        
+                        
+                        writeToSat.writeObject(message);
+                        //Integer result = (Integer) readFromNet.readObject();
+                        //System.out.println(result.toString());
+                        
+                        
+                        //writeToNet = new ObjectOutputStream(client.getOutputStream());
+                        writeToNet.writeObject(readFromSat.readObject());
+                        
+                        
+                    }
+                    catch(Exception e)
+                    {
+                        System.out.println(e.toString());
+                    }
 
                     break;
 

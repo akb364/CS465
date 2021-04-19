@@ -1,0 +1,13 @@
+1)
+java appserver/server/Server ../../config/Server.properties
+
+2-4)
+java appserver/satellite/Satellite ../../config/Satellite.Venus.properties ../../config/WebServer.properties  ../../config/Server.properties
+java appserver/satellite/Satellite ../../config/Satellite.Earth.properties ../../config/WebServer.properties  ../../config/Server.properties
+java appserver/satellite/Satellite ../../config/Satellite.Mercury.properties ../../config/WebServer.properties  ../../config/Server.properties
+
+5)
+java web/SimpleWebServer
+
+6)
+java appserver/client/FibonacciClient

@@ -92,21 +92,18 @@ public class Satellite extends Thread {
             classLoader.classRootDir = prop.getProperty("DOC_ROOT");
             System.out.println("[Satellite.Satellite] HTTPClassLoader created on " + satelliteInfo.getName());
             
-            this.serverSock = new ServerSocket(satelliteInfo.getPort(), 50, InetAddress.getByName(satelliteInfo.getHost()));
+            //this.serverSock = new ServerSocket(satelliteInfo.getPort(), 50, InetAInetddress.getByName(satelliteInfo.getHost()));
 
         }
         catch (IOException ex)
         {
+            System.out.println("yo");
             ex.printStackTrace();
         }
 
         // create tools cache
         // -------------------
         toolsCache = new Hashtable();
-        
-        
-       
-        
     }
 
     @Override
@@ -176,8 +173,8 @@ public class Satellite extends Thread {
             // setting up object streams
             try
             {
-                readFromNet = new ObjectInputStream(jobRequest.getInputStream());
                 writeToNet = new ObjectOutputStream(jobRequest.getOutputStream());
+                readFromNet = new ObjectInputStream(jobRequest.getInputStream());
             }
             catch(Exception e)
             {

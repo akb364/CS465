@@ -10,23 +10,23 @@ public class LoadManager {
 
     static ArrayList satellites = null;
     static int lastSatelliteIndex = -1;
+    int numberSatellites;
 
     public LoadManager() {
         satellites = new ArrayList<String>();
+        numberSatellites = 0;
     }
 
     public void satelliteAdded(String satelliteName) {
         // add satellite
+        numberSatellites++;
         satellites.add(satelliteName);
         System.out.println("[LoadManager.satelliteAdded]" + satelliteName + " added");
     }
 
 
     public String nextSatellite() throws Exception {
-        
-        int numberSatellites = 3;
-        
-        
+     
         synchronized (satellites) {
             // implement policy that returns the satellite name according to a round robin methodology
             lastSatelliteIndex++;
